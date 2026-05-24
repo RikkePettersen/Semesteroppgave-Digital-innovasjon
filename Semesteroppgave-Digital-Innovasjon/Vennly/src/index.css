@@ -1,0 +1,395 @@
+/* ===========================================================================
+   Vennly – global stil. Gul merkepalett.
+   Hovedfarge #FFE8A8, kontrastfarger #FFF6D7 og #C28A3A.
+   =========================================================================== */
+
+:root {
+  /* Merkefarger */
+  --yellow:    #FFE8A8;   /* hovedfarge          */
+  --cream:     #FFF6D7;   /* myk kontrast        */
+  --gold:      #C28A3A;   /* mørk gull-kontrast  */
+  --gold-deep: #A8742C;   /* dypere gull         */
+
+  --grad:      linear-gradient(135deg, #D49A47 0%, #C28A3A 100%);
+  --grad-soft: linear-gradient(135deg, #FFE8A8 0%, #E7C173 100%);
+
+  /* Aliaser – så resten av appen kan beholde samme variabelnavn */
+  --pink:   #C28A3A;
+  --red:    #C28A3A;
+  --orange: #D49A47;
+
+  --like: #4FCC94;   /* grønn for like  */
+  --nope: #F76C6C;   /* rød for nope    */
+  --star: #38B6FF;   /* blå for super   */
+
+  --bg: #FFFDF7;
+  --card: #ffffff;
+  --text: #2b2412;
+  --muted: #9a8f76;
+  --line: #efe7d4;
+  --shadow: 0 8px 30px rgba(120, 90, 20, 0.12);
+  --radius: 16px;
+
+  font-family: 'Segoe UI', Roboto, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: #F1E6C7;
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+}
+
+button { font-family: inherit; cursor: pointer; border: none; }
+input, select, textarea { font-family: inherit; font-size: 1rem; }
+
+/* ---- "Telefon-ramme" som sentrerer appen --------------------------------- */
+.phone {
+  max-width: 430px;
+  margin: 0 auto;
+  min-height: 100vh;
+  background: var(--bg);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 0 60px rgba(120, 90, 20, 0.18);
+  overflow: hidden;
+}
+
+/* ---- Topplinje ----------------------------------------------------------- */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 18px;
+  background: var(--yellow);
+  border-bottom: 1px solid rgba(120, 90, 20, 0.10);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 1.4rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+.logo img { width: 34px; height: 34px; display: block; }
+.logo .brand { color: var(--gold); }
+
+/* ---- Innholdsområde ------------------------------------------------------ */
+.screen {
+  flex: 1;
+  padding: 18px;
+  padding-bottom: 90px;   /* plass til bunnmeny */
+  overflow-y: auto;
+}
+.screen-title { font-size: 1.4rem; font-weight: 800; margin-bottom: 14px; }
+.section-title { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.6px;
+  color: var(--muted); font-weight: 700; margin: 18px 0 8px; }
+
+/* ---- Bunnmeny ------------------------------------------------------------ */
+.bottomnav {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  justify-content: space-around;
+  background: var(--card);
+  border-top: 1px solid var(--line);
+  padding: 9px 0 12px;
+  z-index: 20;
+}
+.navbtn {
+  background: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  color: var(--muted);
+  font-size: 0.66rem;
+  font-weight: 600;
+  flex: 1;
+}
+.navbtn.active { color: var(--gold); }
+
+/* ---- Knapper ------------------------------------------------------------- */
+.btn {
+  width: 100%;
+  padding: 14px;
+  border-radius: 30px;
+  font-size: 1rem;
+  font-weight: 700;
+  background: var(--grad);
+  color: #fff;
+  box-shadow: 0 6px 18px rgba(168, 116, 44, 0.35);
+  transition: transform 0.1s ease, opacity 0.15s ease;
+}
+.btn:active { transform: scale(0.98); }
+.btn:disabled { opacity: 0.55; box-shadow: none; cursor: not-allowed; }
+.btn-outline {
+  background: #fff;
+  color: var(--gold);
+  border: 2px solid var(--gold);
+  box-shadow: none;
+}
+.btn-ghost { background: #fff; color: var(--text); border: 1px solid var(--line); box-shadow: none; }
+
+/* ---- Skjema -------------------------------------------------------------- */
+.field { margin-bottom: 14px; }
+.field label { display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 6px; color: #6b5a32; }
+.field input, .field select, .field textarea {
+  width: 100%;
+  padding: 13px 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fffdf6;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+.field input:focus, .field select:focus, .field textarea:focus { border-color: var(--gold); }
+.hint { font-size: 0.78rem; color: var(--muted); margin-top: 5px; }
+.error { color: var(--nope); font-size: 0.85rem; margin: 8px 0; font-weight: 600; }
+
+/* ---- Interesse-chips ----------------------------------------------------- */
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip {
+  padding: 8px 14px;
+  border-radius: 20px;
+  border: 1.5px solid var(--line);
+  background: #fff;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #6b5a32;
+  transition: all 0.12s ease;
+}
+.chip.selected {
+  background: var(--grad);
+  color: #fff;
+  border-color: transparent;
+}
+.chip-static {
+  padding: 6px 12px;
+  border-radius: 16px;
+  background: var(--cream);
+  color: var(--gold-deep);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+/* ---- Auth-skjerm --------------------------------------------------------- */
+.auth-wrap {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 28px 24px;
+  background: var(--yellow);
+}
+.auth-card {
+  background: #fff;
+  border-radius: 24px;
+  padding: 26px 22px;
+  box-shadow: var(--shadow);
+}
+.auth-logo {
+  text-align: center;
+  margin-bottom: 22px;
+}
+.auth-logo-img { width: 250px; max-width: 78%; height: auto; display: block; margin: 0 auto 2px; }
+.auth-logo p { color: var(--gold-deep); margin-top: 2px; font-weight: 600; }
+.auth-switch { text-align: center; margin-top: 16px; font-size: 0.9rem; color: var(--muted); }
+.auth-switch button { background: none; color: var(--gold); font-weight: 700; }
+
+/* ---- Verifiseringsmerke -------------------------------------------------- */
+.verified {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #e7f6ff;
+  color: #1083d6;
+  font-size: 0.74rem;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 12px;
+}
+
+/* ===========================================================================
+   SWIPE-STOKK
+   =========================================================================== */
+.deck {
+  position: relative;
+  height: 540px;
+  max-height: 64vh;
+  margin: 4px 0 14px;
+}
+.swipe-card {
+  position: absolute;
+  inset: 0;
+  border-radius: 20px;
+  overflow: hidden;
+  background: #ddd center/cover no-repeat;
+  box-shadow: var(--shadow);
+  user-select: none;
+  -webkit-user-drag: none;
+  will-change: transform;
+}
+.swipe-card .overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0.05) 45%, transparent 70%);
+}
+.card-info {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 18px;
+  color: #fff;
+}
+.card-info h2 { font-size: 1.6rem; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+.card-info .age { font-weight: 500; opacity: 0.95; }
+.card-info .meta { margin-top: 4px; font-size: 0.92rem; opacity: 0.95; display:flex; align-items:center; gap:6px; flex-wrap:wrap;}
+.card-info .bio { margin-top: 8px; font-size: 0.9rem; opacity: 0.92; line-height: 1.35; }
+.card-info .chips { margin-top: 10px; }
+.card-info .chip-static { background: rgba(255,255,255,0.22); color: #fff; }
+
+/* Stempel som vises mens man drar */
+.stamp {
+  position: absolute;
+  top: 32px;
+  padding: 6px 16px;
+  border: 4px solid;
+  border-radius: 10px;
+  font-size: 1.7rem;
+  font-weight: 900;
+  letter-spacing: 1px;
+  opacity: 0;
+  transition: opacity 0.05s linear;
+}
+.stamp.like  { left: 20px; color: var(--like); border-color: var(--like); transform: rotate(-18deg); }
+.stamp.nope  { right: 20px; color: var(--nope); border-color: var(--nope); transform: rotate(18deg); }
+
+/* Handlingsknapper under stokken */
+.swipe-actions { display: flex; justify-content: center; gap: 22px; }
+.round {
+  width: 64px; height: 64px;
+  border-radius: 50%;
+  background: #fff;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: var(--shadow);
+  transition: transform 0.1s ease;
+}
+.round:active { transform: scale(0.92); }
+.round.small { width: 50px; height: 50px; }
+.round.nope svg { color: var(--nope); }
+.round.like svg { color: var(--like); }
+.round.star svg { color: var(--star); }
+
+/* Tom stokk */
+.empty {
+  text-align: center;
+  padding: 50px 20px;
+  color: var(--muted);
+}
+
+/* ---- Match-popup --------------------------------------------------------- */
+.match-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--grad);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  color: #fff;
+  text-align: center;
+  padding: 30px;
+  animation: fadein 0.25s ease;
+}
+.match-overlay h2 { font-size: 2.8rem; font-weight: 800; }
+.match-overlay p { margin: 10px 0 26px; opacity: 0.95; font-size: 1.05rem; }
+.match-photos { display: flex; gap: 14px; margin-bottom: 8px; }
+.match-photos img {
+  width: 110px; height: 110px; border-radius: 50%;
+  object-fit: cover; border: 4px solid #fff;
+}
+@keyframes fadein { from { opacity: 0; } to { opacity: 1; } }
+@keyframes pop { 0% { transform: scale(0.6); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+.match-overlay .match-photos, .match-overlay h2 { animation: pop 0.35s ease; }
+
+/* ---- Profil -------------------------------------------------------------- */
+.profile-hero {
+  height: 260px;
+  border-radius: 20px;
+  background: var(--grad) center/cover;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+.profile-hero img { width: 100%; height: 100%; object-fit: cover; }
+.profile-hero .name-tag {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  padding: 18px;
+  background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+  color: #fff;
+}
+.profile-hero .name-tag h2 { font-size: 1.6rem; font-weight: 800; }
+
+.card-box {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 16px;
+  box-shadow: 0 2px 10px rgba(120,90,20,0.06);
+  margin-bottom: 14px;
+}
+.row { display: flex; justify-content: space-between; align-items: center; padding: 13px 0; border-bottom: 1px solid var(--line); }
+.row:last-child { border-bottom: none; }
+.row .label { display: flex; align-items: center; gap: 11px; font-weight: 600; }
+.row .label svg { color: var(--gold); }
+.row .val { color: var(--muted); }
+
+/* ---- Vennly Plus banner -------------------------------------------------- */
+.plus-banner {
+  background: var(--grad-soft);
+  border-radius: var(--radius);
+  padding: 20px;
+  color: var(--gold-deep);
+  margin-bottom: 16px;
+}
+.plus-banner h3 { font-size: 1.25rem; font-weight: 800; display:flex; align-items:center; gap:8px; }
+.plus-banner ul { list-style: none; margin: 12px 0; }
+.plus-banner li { padding: 4px 0; display: flex; align-items: center; gap: 8px; font-size: 0.92rem; }
+.plus-banner .btn { background: #fff; color: var(--gold-deep); box-shadow: none; margin-top: 6px; }
+
+/* ---- Toggle-bryter ------------------------------------------------------- */
+.switch { position: relative; width: 46px; height: 26px; }
+.switch input { display: none; }
+.slider {
+  position: absolute; inset: 0;
+  background: #d8cdb4; border-radius: 26px;
+  transition: 0.2s;
+}
+.slider::before {
+  content: ''; position: absolute;
+  width: 20px; height: 20px; left: 3px; top: 3px;
+  background: #fff; border-radius: 50%; transition: 0.2s;
+}
+.switch input:checked + .slider { background: var(--gold); }
+.switch input:checked + .slider::before { transform: translateX(20px); }
+
+.center { text-align: center; }
+.spinner-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: var(--yellow); color: var(--gold); font-weight:700; font-size:1.5rem;}
+
+/* ---- Demo-banner --------------------------------------------------------- */
+.demo-banner {
+  background: var(--cream);
+  color: #8a6320;
+  font-size: 0.78rem;
+  padding: 8px 14px;
+  text-align: center;
+  border-bottom: 1px solid #ecdcae;
+}
