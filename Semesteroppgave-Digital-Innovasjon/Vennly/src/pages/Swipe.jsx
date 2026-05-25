@@ -1,20 +1,18 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { X, Heart, Star, ShieldCheck, GraduationCap, MapPin, RotateCcw } from 'lucide-react'
+import { X, Heart, ShieldCheck, GraduationCap, MapPin, RotateCcw } from 'lucide-react'
 import Layout from '../components/Layout'
 import { useAuth } from '../context/AuthContext'
 import { SAMPLE_PROFILES } from '../data/sampleProfiles'
 import { addMatch } from '../lib/matches'
 
-const SWIPE_THRESHOLD = 110   // hvor langt man må dra for at det teller
+const SWIPE_THRESHOLD = 110
 
 export default function Swipe() {
   const { profile, user } = useAuth()
   const navigate = useNavigate()
-
-  // Sorter stokken slik at profiler med flere felles interesser kommer øverst.
   const [deck, setDeck] = useState([])
-  const [matched, setMatched] = useState(null)   // profil man nettopp matchet med
+  const [matched, setMatched] = useState(null)
 
   useEffect(() => {
     const mine = profile?.interests || []
@@ -28,10 +26,8 @@ export default function Swipe() {
 
   function handleDecision(liked) {
     if (!top) return
-    // Felles interesser øker sjansen for match (enkel demo-logikk).
     const shared = overlap(top.interests, profile?.interests || [])
     const isMatch = liked && (shared >= 2 || Math.random() > 0.4)
-
     if (isMatch) {
       addMatch(user.uid, top)
       setMatched(top)
@@ -62,9 +58,6 @@ export default function Swipe() {
             <button className="round nope" onClick={() => handleDecision(false)} aria-label="Nei takk">
               <X size={30} strokeWidth={3} />
             </button>
-            <button className="round star small" aria-label="Superlike (Vennly Plus)">
-              <Star size={22} fill="currentColor" />
-            </button>
             <button className="round like" onClick={() => handleDecision(true)} aria-label="Lik">
               <Heart size={30} fill="currentColor" />
             </button>
@@ -92,11 +85,13 @@ export default function Swipe() {
   )
 }
 
-/* ---- Et enkelt swipe-kort med pointer-drag ------------------------------ */
 function Card({ profile, draggable, onDecision, myInterests }) {
   const ref = useRef(null)
   const start = useRef(null)
   const [dragging, setDragging] = useState(false)
+  const [photoIdx, setPhotoIdx] = useState(0)
+
+  const photos = profile.photos?.length ? profile.photos : [profile.photo]
 
   function setTransform(dx, dy, animate = false) {
     const el = ref.current
@@ -116,30 +111,41 @@ function Card({ profile, draggable, onDecision, myInterests }) {
     start.current = { x: point.clientX, y: point.clientY }
     setDragging(true)
   }
+
   function onMove(e) {
     if (!start.current) return
     const point = e.touches ? e.touches[0] : e
     setTransform(point.clientX - start.current.x, point.clientY - start.current.y)
   }
+
   function onUp(e) {
     if (!start.current) return
     const point = e.changedTouches ? e.changedTouches[0] : e
     const dx = point.clientX - start.current.x
+    const absDx = Math.abs(dx)
+    const absDy = Math.abs(point.clientY - start.current.y)
     start.current = null
     setDragging(false)
 
-    if (dx > SWIPE_THRESHOLD) {
-      setTransform(600, 0, true)
-      setTimeout(() => onDecision(true), 200)
-    } else if (dx < -SWIPE_THRESHOLD) {
-      setTransform(-600, 0, true)
-      setTimeout(() => onDecision(false), 200)
+    if (absDx > SWIPE_THRESHOLD) {
+      setTransform(dx > 0 ? 600 : -600, 0, true)
+      setTimeout(() => onDecision(dx > 0), 200)
+    } else if (absDx < 8 && absDy < 8 && photos.length > 1) {
+      setTransform(0, 0, true)
+      const rect = ref.current?.getBoundingClientRect()
+      if (rect) {
+        const relX = point.clientX - rect.left
+        if (relX < rect.width / 2) {
+          setPhotoIdx(i => Math.max(0, i - 1))
+        } else {
+          setPhotoIdx(i => Math.min(photos.length - 1, i + 1))
+        }
+      }
     } else {
-      setTransform(0, 0, true)   // snap tilbake
+      setTransform(0, 0, true)
     }
   }
 
-  // Globale lyttere mens man drar (så man kan dra utenfor kortet)
   useEffect(() => {
     if (!dragging) return
     const move = (e) => onMove(e)
@@ -160,12 +166,21 @@ function Card({ profile, draggable, onDecision, myInterests }) {
     <div
       ref={ref}
       className="swipe-card"
-      style={{ backgroundImage: `url(${profile.photo})` }}
+      style={{ backgroundImage: `url(${photos[photoIdx]})` }}
       onMouseDown={onDown}
       onTouchStart={onDown}
     >
       <div className="stamp like">LIK</div>
       <div className="stamp nope">NEI</div>
+
+      {photos.length > 1 && (
+        <div className="photo-dots">
+          {photos.map((_, i) => (
+            <span key={i} className={`photo-dot${i === photoIdx ? ' active' : ''}`} />
+          ))}
+        </div>
+      )}
+
       <div className="overlay" />
       <div className="card-info">
         <h2>
@@ -174,9 +189,11 @@ function Card({ profile, draggable, onDecision, myInterests }) {
             <span className="verified"><ShieldCheck size={13} /> Verifisert</span>
           )}
         </h2>
-        <div className="meta"><MapPin size={15} /> {profile.city}
+        <div className="meta">
+          <MapPin size={15} /> {profile.city}
           <span style={{ opacity: 0.6 }}>•</span>
-          <GraduationCap size={15} /> {profile.study}</div>
+          <GraduationCap size={15} /> {profile.study}
+        </div>
         <p className="bio">{profile.bio}</p>
         <div className="chips">
           {profile.interests.map((i) => (
@@ -192,7 +209,6 @@ function Card({ profile, draggable, onDecision, myInterests }) {
   )
 }
 
-/* ---- Match-popup (tilbakemelding/feedback-prinsippet) ------------------- */
 function MatchOverlay({ me, them, onClose, onMessage }) {
   return (
     <div className="match-overlay">

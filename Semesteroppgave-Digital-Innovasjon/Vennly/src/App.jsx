@@ -6,7 +6,8 @@ import Matches from './pages/Matches'
 import Profile from './pages/Profile'
 import Settings from './pages/Settings'
 import Placeholder from './pages/Placeholder'
-import { MessageCircle, CalendarDays } from 'lucide-react'
+import Events from './pages/Events'
+import { MessageCircle } from 'lucide-react'
 
 // Beskytter ruter som krever innlogging.
 function Protected({ children }) {
@@ -34,10 +35,7 @@ export default function App() {
         <Placeholder title="Meldinger" Icon={MessageCircle}
           text="Start en samtale!" />
       </Protected>} />
-      <Route path="/arrangementer" element={<Protected>
-        <Placeholder title="Arrangementer" Icon={CalendarDays}
-          text="Her kommer studentarrangementer og grupper i din by." />
-      </Protected>} />
+      <Route path="/arrangementer" element={<Protected><Events /></Protected>} />
 
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

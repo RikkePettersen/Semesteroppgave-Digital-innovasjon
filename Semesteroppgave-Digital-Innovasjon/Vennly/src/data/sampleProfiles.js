@@ -1,7 +1,3 @@
-// Eksempelprofiler til swipe-stokken. I en full løsning ville disse kommet
-// fra Firestore, men her bruker vi statiske profiler så demoen alltid funker.
-// Bildene er fra unsplash (gratis å bruke).
-
 export const SAMPLE_PROFILES = [
   {
     id: 'p1', name: 'Emma', age: 21, city: 'Bergen',
@@ -9,6 +5,11 @@ export const SAMPLE_PROFILES = [
     bio: 'Ny i Bergen og leter etter noen å gå på tur og ta kaffe med ☕️',
     interests: ['Friluftsliv', 'Kaffe', 'Trening', 'Musikk'],
     photo: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=600&q=80',
+    photos: [
+      'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=600&q=80',
+      'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=600&q=80',
+      'https://images.unsplash.com/photo-1511497584788-876760111969?w=600&q=80',
+    ],
     verified: true,
   },
   {
@@ -17,6 +18,10 @@ export const SAMPLE_PROFILES = [
     bio: 'Koder på dagen, gamer på kvelden. Søker co-op buddy 🎮',
     interests: ['Gaming', 'Film & serier', 'Klatring'],
     photo: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=600&q=80',
+    photos: [
+      'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=600&q=80',
+      'https://images.unsplash.com/photo-1521119989659-a83eee488004?w=600&q=80',
+    ],
     verified: true,
   },
   {
@@ -25,6 +30,11 @@ export const SAMPLE_PROFILES = [
     bio: 'Elsker kunst, brettspill og lange kafébesøk. Ta kontakt! 🎨',
     interests: ['Kunst', 'Brettspill', 'Kaffe', 'Lesing'],
     photo: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=600&q=80',
+    photos: [
+      'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=600&q=80',
+      'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=600&q=80',
+      'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=600&q=80',
+    ],
     verified: true,
   },
   {
@@ -33,6 +43,10 @@ export const SAMPLE_PROFILES = [
     bio: 'Friluftsmenneske som vil ha med folk på topptur og fjelltur 🏔️',
     interests: ['Friluftsliv', 'Foto', 'Trening', 'Reise'],
     photo: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&q=80',
+    photos: [
+      'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&q=80',
+      'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=600&q=80',
+    ],
     verified: false,
   },
   {
@@ -41,6 +55,11 @@ export const SAMPLE_PROFILES = [
     bio: 'Dansevenn søkes! Også glad i matlaging og gode serier 💃',
     interests: ['Dans', 'Matlaging', 'Film & serier', 'Musikk'],
     photo: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600&q=80',
+    photos: [
+      'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600&q=80',
+      'https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?w=600&q=80',
+      'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=600&q=80',
+    ],
     verified: true,
   },
   {
@@ -49,6 +68,10 @@ export const SAMPLE_PROFILES = [
     bio: 'Liker å spille fotball og henge på campus. Bli med på trening? ⚽️',
     interests: ['Fotball', 'Trening', 'Reise', 'Kaffe'],
     photo: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=600&q=80',
+    photos: [
+      'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=600&q=80',
+      'https://images.unsplash.com/photo-1527980965255-d3b416303d12?w=600&q=80',
+    ],
     verified: true,
   },
 ]

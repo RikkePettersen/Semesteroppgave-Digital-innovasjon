@@ -1,32 +1,30 @@
 /* ===========================================================================
    Vennly – global stil. Gul merkepalett.
-   Hovedfarge #FFE8A8, kontrastfarger #FFF6D7 og #C28A3A.
+   Responsiv: mobil (bunnmeny) og PC (venstresidemeny).
    =========================================================================== */
 
 :root {
-  /* Merkefarger */
-  --yellow:    #FFE8A8;   /* hovedfarge          */
-  --cream:     #FFF6D7;   /* myk kontrast        */
-  --gold:      #C28A3A;   /* mørk gull-kontrast  */
-  --gold-deep: #A8742C;   /* dypere gull         */
+  --yellow:    #FFE8A8;
+  --cream:     #FFF6D7;
+  --gold:      #C28A3A;
+  --gold-deep: #A8742C;
 
   --grad:      linear-gradient(135deg, #D49A47 0%, #C28A3A 100%);
   --grad-soft: linear-gradient(135deg, #FFE8A8 0%, #E7C173 100%);
 
-  /* Aliaser – så resten av appen kan beholde samme variabelnavn */
   --pink:   #C28A3A;
   --red:    #C28A3A;
   --orange: #D49A47;
 
-  --like: #4FCC94;   /* grønn for like  */
-  --nope: #F76C6C;   /* rød for nope    */
-  --star: #38B6FF;   /* blå for super   */
+  --like: #4FCC94;
+  --nope: #F76C6C;
+  --star: #38B6FF;
 
-  --bg: #FFFDF7;
-  --card: #ffffff;
-  --text: #2b2412;
-  --muted: #9a8f76;
-  --line: #efe7d4;
+  --bg:     #FFFDF7;
+  --card:   #ffffff;
+  --text:   #2b2412;
+  --muted:  #9a8f76;
+  --line:   #efe7d4;
   --shadow: 0 8px 30px rgba(120, 90, 20, 0.12);
   --radius: 16px;
 
@@ -36,7 +34,7 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  background: #F1E6C7;
+  background: #E8DCC5;
   color: var(--text);
   -webkit-font-smoothing: antialiased;
 }
@@ -44,20 +42,33 @@ body {
 button { font-family: inherit; cursor: pointer; border: none; }
 input, select, textarea { font-family: inherit; font-size: 1rem; }
 
-/* ---- "Telefon-ramme" som sentrerer appen --------------------------------- */
+/* ===========================================================================
+   Appskall
+   =========================================================================== */
+
 .phone {
-  max-width: 430px;
   margin: 0 auto;
   min-height: 100vh;
+  min-height: 100dvh;
   background: var(--bg);
-  position: relative;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;   /* sidebar til venstre alltid */
   box-shadow: 0 0 60px rgba(120, 90, 20, 0.18);
-  overflow: hidden;
+  overflow-x: clip;      /* klipper kort som flyger ut uten å bryte sticky */
 }
 
-/* ---- Topplinje ----------------------------------------------------------- */
+/* Innholdskolonne (topbar + screen) */
+.content-area {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===========================================================================
+   Topbar
+   =========================================================================== */
+
 .topbar {
   display: flex;
   align-items: center;
@@ -68,7 +79,9 @@ input, select, textarea { font-family: inherit; font-size: 1rem; }
   position: sticky;
   top: 0;
   z-index: 20;
+  flex-shrink: 0;
 }
+
 .logo {
   display: flex;
   align-items: center;
@@ -77,45 +90,138 @@ input, select, textarea { font-family: inherit; font-size: 1rem; }
   font-weight: 800;
   letter-spacing: -0.5px;
 }
-.logo img { width: 34px; height: 34px; display: block; }
+.logo img { width: 32px; height: 32px; display: block; }
 .logo .brand { color: var(--gold); }
 
-/* ---- Innholdsområde ------------------------------------------------------ */
-.screen {
-  flex: 1;
-  padding: 18px;
-  padding-bottom: 90px;   /* plass til bunnmeny */
-  overflow-y: auto;
+/* ===========================================================================
+   Sidemeny – mobil (bunnmeny) og PC (venstresidemeny)
+   =========================================================================== */
+
+.sidenav-brand { display: none; }   /* kun synlig på PC */
+
+/* --- Mobil: bunnmeny ------------------------------------------------------- */
+@media (max-width: 767px) {
+  .phone {
+    flex-direction: column;
+    max-width: 430px;
+  }
+
+  .bottomnav {
+    order: 99;           /* havner sist = bunn */
+    position: sticky;
+    bottom: 0;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    background: var(--card);
+    border-top: 2px solid var(--line);
+    padding: 10px 0 14px;
+    z-index: 20;
+    flex-shrink: 0;
+  }
+
+  .navbtn {
+    background: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    color: var(--muted);
+    font-size: 0.68rem;
+    font-weight: 700;
+    flex: 1;
+    padding: 0 4px;
+  }
+  .navbtn.active { color: var(--gold); }
+
+  .screen {
+    flex: 1;
+    padding: 16px;
+    padding-bottom: 94px;  /* luft under bunnmenyen */
+    overflow-y: auto;
+  }
 }
+
+/* --- PC: venstresidemeny -------------------------------------------------- */
+@media (min-width: 768px) {
+  .phone {
+    max-width: 1200px;
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+
+  .bottomnav {
+    width: 230px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 3px;
+    padding: 0 10px 20px;
+    background: var(--card);
+    border-right: 1px solid var(--line);
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    height: 100dvh;
+    overflow-y: auto;
+  }
+
+  .sidenav-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 22px 10px 20px;
+    font-size: 1.45rem;
+    font-weight: 800;
+    color: var(--gold);
+    letter-spacing: -0.5px;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 10px;
+    flex-shrink: 0;
+  }
+  .sidenav-brand img { width: 34px; height: 34px; display: block; }
+
+  .navbtn {
+    background: none;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 13px;
+    padding: 13px 14px;
+    border-radius: 14px;
+    color: var(--muted);
+    font-size: 0.95rem;
+    font-weight: 600;
+    transition: background 0.12s, color 0.12s;
+    text-decoration: none;
+  }
+  .navbtn:hover { background: var(--cream); color: var(--gold-deep); }
+  .navbtn.active { background: var(--grad-soft); color: var(--gold-deep); font-weight: 700; }
+  .navbtn span { font-size: 0.95rem; }
+
+  /* Skjul logoen i topbar (vises allerede i sidemeny) */
+  .topbar-logo-img { display: none; }
+  .topbar { padding: 14px 24px; }
+  .logo .brand { font-size: 1.1rem; color: var(--text); font-weight: 700; }
+
+  .screen {
+    flex: 1;
+    padding: 28px 32px;
+    padding-bottom: 40px;
+    overflow-y: auto;
+    max-width: 720px;
+  }
+}
+
+/* ===========================================================================
+   Generelle komponenter
+   =========================================================================== */
+
 .screen-title { font-size: 1.4rem; font-weight: 800; margin-bottom: 14px; }
-.section-title { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.6px;
-  color: var(--muted); font-weight: 700; margin: 18px 0 8px; }
+.section-title { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.6px; color: var(--muted); font-weight: 700; margin: 18px 0 8px; }
 
-/* ---- Bunnmeny ------------------------------------------------------------ */
-.bottomnav {
-  position: sticky;
-  bottom: 0;
-  display: flex;
-  justify-content: space-around;
-  background: var(--card);
-  border-top: 1px solid var(--line);
-  padding: 9px 0 12px;
-  z-index: 20;
-}
-.navbtn {
-  background: none;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 3px;
-  color: var(--muted);
-  font-size: 0.66rem;
-  font-weight: 600;
-  flex: 1;
-}
-.navbtn.active { color: var(--gold); }
-
-/* ---- Knapper ------------------------------------------------------------- */
+/* Knapper */
 .btn {
   width: 100%;
   padding: 14px;
@@ -129,15 +235,10 @@ input, select, textarea { font-family: inherit; font-size: 1rem; }
 }
 .btn:active { transform: scale(0.98); }
 .btn:disabled { opacity: 0.55; box-shadow: none; cursor: not-allowed; }
-.btn-outline {
-  background: #fff;
-  color: var(--gold);
-  border: 2px solid var(--gold);
-  box-shadow: none;
-}
-.btn-ghost { background: #fff; color: var(--text); border: 1px solid var(--line); box-shadow: none; }
+.btn-outline { background: #fff; color: var(--gold); border: 2px solid var(--gold); box-shadow: none; }
+.btn-ghost   { background: #fff; color: var(--text); border: 1px solid var(--line); box-shadow: none; }
 
-/* ---- Skjema -------------------------------------------------------------- */
+/* Felt */
 .field { margin-bottom: 14px; }
 .field label { display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 6px; color: #6b5a32; }
 .field input, .field select, .field textarea {
@@ -150,10 +251,10 @@ input, select, textarea { font-family: inherit; font-size: 1rem; }
   transition: border-color 0.15s ease;
 }
 .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--gold); }
-.hint { font-size: 0.78rem; color: var(--muted); margin-top: 5px; }
+.hint  { font-size: 0.78rem; color: var(--muted); margin-top: 5px; }
 .error { color: var(--nope); font-size: 0.85rem; margin: 8px 0; font-weight: 600; }
 
-/* ---- Interesse-chips ----------------------------------------------------- */
+/* Chips */
 .chips { display: flex; flex-wrap: wrap; gap: 8px; }
 .chip {
   padding: 8px 14px;
@@ -165,172 +266,166 @@ input, select, textarea { font-family: inherit; font-size: 1rem; }
   color: #6b5a32;
   transition: all 0.12s ease;
 }
-.chip.selected {
-  background: var(--grad);
-  color: #fff;
-  border-color: transparent;
-}
-.chip-static {
-  padding: 6px 12px;
-  border-radius: 16px;
-  background: var(--cream);
-  color: var(--gold-deep);
-  font-size: 0.8rem;
-  font-weight: 600;
-}
+.chip.selected { background: var(--grad); color: #fff; border-color: transparent; }
+.chip-static { padding: 6px 12px; border-radius: 16px; background: var(--cream); color: var(--gold-deep); font-size: 0.8rem; font-weight: 600; }
 
-/* ---- Auth-skjerm --------------------------------------------------------- */
+/* ===========================================================================
+   Autentisering
+   =========================================================================== */
+
 .auth-wrap {
   min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
   justify-content: center;
   padding: 28px 24px;
   background: var(--yellow);
 }
-.auth-card {
-  background: #fff;
-  border-radius: 24px;
-  padding: 26px 22px;
-  box-shadow: var(--shadow);
-}
-.auth-logo {
-  text-align: center;
-  margin-bottom: 22px;
-}
+.auth-card { background: #fff; border-radius: 24px; padding: 26px 22px; box-shadow: var(--shadow); }
+.auth-logo { text-align: center; margin-bottom: 22px; }
 .auth-logo-img { width: 250px; max-width: 78%; height: auto; display: block; margin: 0 auto 2px; }
 .auth-logo p { color: var(--gold-deep); margin-top: 2px; font-weight: 600; }
 .auth-switch { text-align: center; margin-top: 16px; font-size: 0.9rem; color: var(--muted); }
 .auth-switch button { background: none; color: var(--gold); font-weight: 700; }
-
-/* ---- Verifiseringsmerke -------------------------------------------------- */
-.verified {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  background: #e7f6ff;
-  color: #1083d6;
-  font-size: 0.74rem;
-  font-weight: 700;
-  padding: 3px 9px;
-  border-radius: 12px;
+@media (min-width: 768px) {
+  .auth-wrap { align-items: center; }
+  .auth-card { max-width: 440px; width: 100%; }
 }
 
 /* ===========================================================================
-   SWIPE-STOKK
+   Verifisert-badge
    =========================================================================== */
+
+.verified {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: #e7f6ff; color: #1083d6;
+  font-size: 0.74rem; font-weight: 700;
+  padding: 3px 9px; border-radius: 12px;
+}
+
+/* ===========================================================================
+   Swipe-stokk
+   =========================================================================== */
+
 .deck {
   position: relative;
-  height: 540px;
-  max-height: 64vh;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  max-height: 74vh;
   margin: 4px 0 14px;
 }
+
+@media (min-width: 768px) {
+  .deck {
+    max-width: 420px;
+    max-height: 76vh;
+  }
+}
+
 .swipe-card {
-  position: absolute;
-  inset: 0;
-  border-radius: 20px;
-  overflow: hidden;
+  position: absolute; inset: 0;
+  border-radius: 20px; overflow: hidden;
   background: #ddd center/cover no-repeat;
   box-shadow: var(--shadow);
-  user-select: none;
-  -webkit-user-drag: none;
-  will-change: transform;
+  user-select: none; -webkit-user-drag: none; will-change: transform;
 }
 .swipe-card .overlay {
-  position: absolute;
-  inset: 0;
+  position: absolute; inset: 0;
   background: linear-gradient(to top, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0.05) 45%, transparent 70%);
 }
-.card-info {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 18px;
-  color: #fff;
-}
-.card-info h2 { font-size: 1.6rem; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+.card-info { position: absolute; bottom: 0; left: 0; right: 0; padding: 18px; color: #fff; }
+.card-info h2 { font-size: 1.6rem; font-weight: 800; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .card-info .age { font-weight: 500; opacity: 0.95; }
-.card-info .meta { margin-top: 4px; font-size: 0.92rem; opacity: 0.95; display:flex; align-items:center; gap:6px; flex-wrap:wrap;}
+.card-info .meta { margin-top: 4px; font-size: 0.92rem; opacity: 0.95; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 .card-info .bio { margin-top: 8px; font-size: 0.9rem; opacity: 0.92; line-height: 1.35; }
 .card-info .chips { margin-top: 10px; }
 .card-info .chip-static { background: rgba(255,255,255,0.22); color: #fff; }
 
-/* Stempel som vises mens man drar */
+/* Stempler */
 .stamp {
-  position: absolute;
-  top: 32px;
-  padding: 6px 16px;
-  border: 4px solid;
-  border-radius: 10px;
-  font-size: 1.7rem;
-  font-weight: 900;
-  letter-spacing: 1px;
-  opacity: 0;
-  transition: opacity 0.05s linear;
+  position: absolute; top: 32px;
+  padding: 6px 16px; border: 4px solid; border-radius: 10px;
+  font-size: 1.7rem; font-weight: 900; letter-spacing: 1px;
+  opacity: 0; transition: opacity 0.05s linear;
 }
-.stamp.like  { left: 20px; color: var(--like); border-color: var(--like); transform: rotate(-18deg); }
-.stamp.nope  { right: 20px; color: var(--nope); border-color: var(--nope); transform: rotate(18deg); }
+.stamp.like { left: 20px;  color: var(--like); border-color: var(--like); transform: rotate(-18deg); }
+.stamp.nope { right: 20px; color: var(--nope); border-color: var(--nope); transform: rotate(18deg); }
 
-/* Handlingsknapper under stokken */
-.swipe-actions { display: flex; justify-content: center; gap: 22px; }
+/* Handlingsknapper */
+.swipe-actions { display: flex; justify-content: center; gap: 30px; margin-top: 4px; }
 .round {
-  width: 64px; height: 64px;
-  border-radius: 50%;
-  background: #fff;
-  display: flex; align-items: center; justify-content: center;
-  box-shadow: var(--shadow);
-  transition: transform 0.1s ease;
+  width: 68px; height: 68px; border-radius: 50%;
+  background: #fff; display: flex; align-items: center; justify-content: center;
+  box-shadow: var(--shadow); transition: transform 0.1s ease;
 }
 .round:active { transform: scale(0.92); }
-.round.small { width: 50px; height: 50px; }
 .round.nope svg { color: var(--nope); }
 .round.like svg { color: var(--like); }
-.round.star svg { color: var(--star); }
 
-/* Tom stokk */
-.empty {
-  text-align: center;
-  padding: 50px 20px;
-  color: var(--muted);
-}
+/* ===========================================================================
+   Bildedots (swipe-kort og profil-hero)
+   =========================================================================== */
 
-/* ---- Match-popup --------------------------------------------------------- */
-.match-overlay {
-  position: fixed;
-  inset: 0;
-  background: var(--grad);
+.photo-dots {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  z-index: 100;
-  color: #fff;
-  text-align: center;
-  padding: 30px;
+  gap: 5px;
+  z-index: 10;
+}
+.hero-dots { top: 12px; }
+.photo-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.45);
+  transition: background 0.2s;
+}
+.photo-dot.active { background: #fff; }
+
+/* ===========================================================================
+   Tom tilstand
+   =========================================================================== */
+
+.empty { text-align: center; padding: 50px 20px; color: var(--muted); }
+
+/* ===========================================================================
+   Match-overlay
+   =========================================================================== */
+
+.match-overlay {
+  position: fixed; inset: 0;
+  background: var(--grad);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  z-index: 100; color: #fff; text-align: center; padding: 30px;
   animation: fadein 0.25s ease;
 }
 .match-overlay h2 { font-size: 2.8rem; font-weight: 800; }
-.match-overlay p { margin: 10px 0 26px; opacity: 0.95; font-size: 1.05rem; }
+.match-overlay p  { margin: 10px 0 26px; opacity: 0.95; font-size: 1.05rem; }
 .match-photos { display: flex; gap: 14px; margin-bottom: 8px; }
-.match-photos img {
-  width: 110px; height: 110px; border-radius: 50%;
-  object-fit: cover; border: 4px solid #fff;
-}
+.match-photos img { width: 110px; height: 110px; border-radius: 50%; object-fit: cover; border: 4px solid #fff; }
 @keyframes fadein { from { opacity: 0; } to { opacity: 1; } }
 @keyframes pop { 0% { transform: scale(0.6); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
 .match-overlay .match-photos, .match-overlay h2 { animation: pop 0.35s ease; }
 
-/* ---- Profil -------------------------------------------------------------- */
+/* ===========================================================================
+   Profil
+   =========================================================================== */
+
 .profile-hero {
-  height: 260px;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  max-height: 76vh;
   border-radius: 20px;
   background: var(--grad) center/cover;
   position: relative;
   overflow: hidden;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
+  cursor: pointer;
 }
-.profile-hero img { width: 100%; height: 100%; object-fit: cover; }
+.profile-hero img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .profile-hero .name-tag {
   position: absolute; bottom: 0; left: 0; right: 0;
   padding: 18px;
@@ -339,57 +434,179 @@ input, select, textarea { font-family: inherit; font-size: 1rem; }
 }
 .profile-hero .name-tag h2 { font-size: 1.6rem; font-weight: 800; }
 
-.card-box {
-  background: var(--card);
-  border-radius: var(--radius);
-  padding: 16px;
-  box-shadow: 0 2px 10px rgba(120,90,20,0.06);
-  margin-bottom: 14px;
+@media (min-width: 768px) {
+  .profile-hero {
+    max-width: 420px;
+    max-height: 76vh;
+  }
 }
+
+/* Kortbokser */
+.card-box { background: var(--card); border-radius: var(--radius); padding: 16px; box-shadow: 0 2px 10px rgba(120,90,20,0.06); margin-bottom: 14px; }
 .row { display: flex; justify-content: space-between; align-items: center; padding: 13px 0; border-bottom: 1px solid var(--line); }
 .row:last-child { border-bottom: none; }
 .row .label { display: flex; align-items: center; gap: 11px; font-weight: 600; }
 .row .label svg { color: var(--gold); }
 .row .val { color: var(--muted); }
 
-/* ---- Vennly Plus banner -------------------------------------------------- */
-.plus-banner {
-  background: var(--grad-soft);
-  border-radius: var(--radius);
-  padding: 20px;
-  color: var(--gold-deep);
-  margin-bottom: 16px;
-}
-.plus-banner h3 { font-size: 1.25rem; font-weight: 800; display:flex; align-items:center; gap:8px; }
+/* Vennly Plus-banner */
+.plus-banner { background: var(--grad-soft); border-radius: var(--radius); padding: 20px; color: var(--gold-deep); margin-bottom: 16px; }
+.plus-banner h3 { font-size: 1.25rem; font-weight: 800; display: flex; align-items: center; gap: 8px; }
 .plus-banner ul { list-style: none; margin: 12px 0; }
 .plus-banner li { padding: 4px 0; display: flex; align-items: center; gap: 8px; font-size: 0.92rem; }
 .plus-banner .btn { background: #fff; color: var(--gold-deep); box-shadow: none; margin-top: 6px; }
 
-/* ---- Toggle-bryter ------------------------------------------------------- */
+/* Bildegrid (redigering) */
+.photo-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+.photo-slot {
+  position: relative;
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--cream);
+  border: 2px dashed var(--line);
+  aspect-ratio: 3/4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+.photo-slot:hover  { border-color: var(--gold); }
+.photo-slot.filled { border: none; cursor: default; }
+.photo-slot.main-slot { grid-row: span 2; }
+.photo-slot img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.slot-add { font-size: 2rem; color: var(--gold); line-height: 1; }
+.main-label {
+  position: absolute; top: 8px; left: 8px;
+  background: rgba(0,0,0,0.5); color: #fff;
+  font-size: 0.7rem; font-weight: 700;
+  padding: 3px 8px; border-radius: 8px;
+}
+.slot-actions {
+  position: absolute; bottom: 6px; right: 6px;
+  display: flex; gap: 5px;
+}
+.slot-btn {
+  width: 28px; height: 28px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  border: none; cursor: pointer; color: #fff;
+}
+.slot-btn.replace { background: rgba(0,0,0,0.55); }
+.slot-btn.remove  { background: rgba(220,60,60,0.85); }
+
+/* Bio-teller */
+.bio-counter { text-align: right; font-size: 0.78rem; color: var(--muted); margin-top: 4px; }
+.bio-counter.over { color: var(--nope); font-weight: 700; }
+
+/* ===========================================================================
+   Matcher
+   =========================================================================== */
+
+/* ===========================================================================
+   Innstillinger
+   =========================================================================== */
+
 .switch { position: relative; width: 46px; height: 26px; }
 .switch input { display: none; }
-.slider {
-  position: absolute; inset: 0;
-  background: #d8cdb4; border-radius: 26px;
-  transition: 0.2s;
-}
-.slider::before {
-  content: ''; position: absolute;
-  width: 20px; height: 20px; left: 3px; top: 3px;
-  background: #fff; border-radius: 50%; transition: 0.2s;
-}
+.slider { position: absolute; inset: 0; background: #d8cdb4; border-radius: 26px; transition: 0.2s; }
+.slider::before { content: ''; position: absolute; width: 20px; height: 20px; left: 3px; top: 3px; background: #fff; border-radius: 50%; transition: 0.2s; }
 .switch input:checked + .slider { background: var(--gold); }
 .switch input:checked + .slider::before { transform: translateX(20px); }
 
-.center { text-align: center; }
-.spinner-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: var(--yellow); color: var(--gold); font-weight:700; font-size:1.5rem;}
+/* ===========================================================================
+   Arrangementer
+   =========================================================================== */
 
-/* ---- Demo-banner --------------------------------------------------------- */
-.demo-banner {
-  background: var(--cream);
-  color: #8a6320;
-  font-size: 0.78rem;
-  padding: 8px 14px;
-  text-align: center;
-  border-bottom: 1px solid #ecdcae;
+.event-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 18px;
+  box-shadow: 0 2px 10px rgba(120,90,20,0.07);
+  margin-bottom: 14px;
 }
+.event-header { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 10px; }
+.event-emoji  { font-size: 2rem; line-height: 1; }
+.event-title  { font-size: 1.1rem; font-weight: 800; color: var(--text); margin-bottom: 4px; }
+.event-badge  {
+  display: inline-block;
+  background: var(--cream); color: var(--gold-deep);
+  font-size: 0.72rem; font-weight: 700;
+  padding: 2px 9px; border-radius: 10px;
+}
+.event-desc   { font-size: 0.88rem; color: var(--muted); line-height: 1.45; margin-bottom: 12px; }
+.event-meta   { display: flex; flex-wrap: wrap; gap: 10px; font-size: 0.8rem; color: var(--muted); margin-bottom: 14px; }
+.event-meta span { display: flex; align-items: center; gap: 4px; }
+.event-footer { display: flex; justify-content: space-between; align-items: center; }
+.event-spots  { display: flex; align-items: center; gap: 5px; font-size: 0.82rem; font-weight: 700; color: var(--like); }
+.event-spots.few  { color: #E8951A; }
+.event-spots.full { color: var(--nope); }
+.event-btn {
+  padding: 9px 20px; border-radius: 20px;
+  font-size: 0.85rem; font-weight: 700;
+  background: var(--grad); color: #fff;
+  border: none; cursor: pointer; transition: opacity 0.15s;
+}
+.event-btn.joined   { background: var(--like); }
+.event-btn.disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* ---- Emoji-velger -------------------------------------------------------- */
+.emoji-pick-btn {
+  width: 54px;
+  height: 54px;
+  border-radius: 12px;
+  border: 1.5px solid var(--line);
+  background: var(--cream);
+  font-size: 1.6rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: border-color 0.15s;
+}
+.emoji-pick-btn:hover { border-color: var(--gold); }
+
+.emoji-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 6px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 12px;
+  margin-bottom: 14px;
+}
+@media (max-width: 400px) {
+  .emoji-grid { grid-template-columns: repeat(6, 1fr); }
+}
+
+.emoji-option {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 10px;
+  border: 2px solid transparent;
+  background: none;
+  font-size: 1.35rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.1s, border-color 0.1s;
+}
+.emoji-option:hover   { background: var(--cream); }
+.emoji-option.selected { border-color: var(--gold); background: var(--cream); }
+
+/* ===========================================================================
+   Diverse
+   =========================================================================== */
+
+.center { text-align: center; }
+.spinner-wrap { min-height: 100vh; min-height: 100dvh; display: flex; align-items: center; justify-content: center; background: var(--yellow); color: var(--gold); font-weight: 700; font-size: 1.5rem; }
+.demo-banner  { background: var(--cream); color: #8a6320; font-size: 0.78rem; padding: 8px 14px; text-align: center; border-bottom: 1px solid #ecdcae; }
+
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
