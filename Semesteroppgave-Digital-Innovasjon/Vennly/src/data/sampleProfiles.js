@@ -1,6 +1,21 @@
+// Koordinater: omtrentlig sentrum av hver by
+export const CITY_COORDS = {
+  'Oslo':         { lat: 59.9139, lng: 10.7522 },
+  'Bergen':       { lat: 60.3913, lng:  5.3221 },
+  'Trondheim':    { lat: 63.4305, lng: 10.3951 },
+  'Tromsø':       { lat: 69.6492, lng: 18.9553 },
+  'Stavanger':    { lat: 58.9700, lng:  5.7331 },
+  'Kristiansand': { lat: 58.1467, lng:  7.9956 },
+  'Bodø':         { lat: 67.2804, lng: 14.4050 },
+  'Ålesund':      { lat: 62.4722, lng:  6.1549 },
+  'Drammen':      { lat: 59.7440, lng: 10.2045 },
+  'Lillehammer':  { lat: 61.1153, lng: 10.4661 },
+}
+
 export const SAMPLE_PROFILES = [
   {
     id: 'p1', name: 'Emma', age: 21, city: 'Bergen',
+    coords: CITY_COORDS['Bergen'],
     study: 'Sykepleie', year: '2. året',
     bio: 'Ny i Bergen og leter etter noen å gå på tur og ta kaffe med ☕️',
     interests: ['Friluftsliv', 'Kaffe', 'Trening', 'Musikk'],
@@ -14,6 +29,7 @@ export const SAMPLE_PROFILES = [
   },
   {
     id: 'p2', name: 'Mathias', age: 23, city: 'Trondheim',
+    coords: CITY_COORDS['Trondheim'],
     study: 'Informatikk', year: '4. året',
     bio: 'Koder på dagen, gamer på kvelden. Søker co-op buddy 🎮',
     interests: ['Gaming', 'Film & serier', 'Klatring'],
@@ -26,6 +42,7 @@ export const SAMPLE_PROFILES = [
   },
   {
     id: 'p3', name: 'Sofie', age: 20, city: 'Oslo',
+    coords: CITY_COORDS['Oslo'],
     study: 'Psykologi', year: '1. året',
     bio: 'Elsker kunst, brettspill og lange kafébesøk. Ta kontakt! 🎨',
     interests: ['Kunst', 'Brettspill', 'Kaffe', 'Lesing'],
@@ -39,6 +56,7 @@ export const SAMPLE_PROFILES = [
   },
   {
     id: 'p4', name: 'Jonas', age: 24, city: 'Tromsø',
+    coords: CITY_COORDS['Tromsø'],
     study: 'Ingeniør', year: 'Master',
     bio: 'Friluftsmenneske som vil ha med folk på topptur og fjelltur 🏔️',
     interests: ['Friluftsliv', 'Foto', 'Trening', 'Reise'],
@@ -51,6 +69,7 @@ export const SAMPLE_PROFILES = [
   },
   {
     id: 'p5', name: 'Amalie', age: 22, city: 'Stavanger',
+    coords: CITY_COORDS['Stavanger'],
     study: 'Markedsføring', year: '3. året',
     bio: 'Dansevenn søkes! Også glad i matlaging og gode serier 💃',
     interests: ['Dans', 'Matlaging', 'Film & serier', 'Musikk'],
@@ -64,6 +83,7 @@ export const SAMPLE_PROFILES = [
   },
   {
     id: 'p6', name: 'Henrik', age: 25, city: 'Oslo',
+    coords: CITY_COORDS['Oslo'],
     study: 'Økonomi og administrasjon', year: 'Master',
     bio: 'Liker å spille fotball og henge på campus. Bli med på trening? ⚽️',
     interests: ['Fotball', 'Trening', 'Reise', 'Kaffe'],

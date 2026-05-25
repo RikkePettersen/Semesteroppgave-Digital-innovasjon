@@ -1,0 +1,130 @@
+import { useEffect, useRef, useState } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
+import { ChevronLeft, MessageCircle, Send } from 'lucide-react'
+import BottomNav from '../components/BottomNav'
+import Layout from '../components/Layout'
+import { useAuth } from '../context/AuthContext'
+import { getMatches } from '../lib/matches'
+import { getMessages, saveMessage } from '../lib/messages'
+
+const RESPONSES = [
+  'Hei! Hyggelig å høre fra deg 😊',
+  'Ja, det hadde vært gøy!',
+  'Når passer det for deg?',
+  'Så kult!',
+  'La oss avtale noe snart 🙌',
+  'Høres bra ut! 😄',
+  'Det er jeg med på!',
+  'Haha ja! 😄',
+  'Gleder meg til å møte deg 👋',
+  'Absolutt, bare si fra!',
+]
+
+export default function Chat() {
+  const { matchId } = useParams()
+  const { user } = useAuth()
+  const navigate = useNavigate()
+  const [match, setMatch]     = useState(null)
+  const [messages, setMessages] = useState([])
+  const [text, setText]       = useState('')
+  const [typing, setTyping]   = useState(false)
+  const [loading, setLoading] = useState(true)
+  const bottomRef = useRef(null)
+
+  useEffect(() => {
+    if (!user || !matchId) { setLoading(false); return }
+    getMatches(user.uid).then(list => {
+      const m = list.find(x => x.id === matchId)
+      setMatch(m || null)
+      if (m) setMessages(getMessages(user.uid, matchId))
+      setLoading(false)
+    })
+  }, [user, matchId])
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages, typing])
+
+  function handleSend(e) {
+    e.preventDefault()
+    if (!text.trim() || !match) return
+    const msg = saveMessage(user.uid, matchId, text.trim(), user.uid)
+    setMessages(prev => [...prev, msg])
+    setText('')
+    setTyping(true)
+    setTimeout(() => {
+      const reply = saveMessage(
+        user.uid, matchId,
+        RESPONSES[Math.floor(Math.random() * RESPONSES.length)],
+        matchId,
+      )
+      setMessages(prev => [...prev, reply])
+      setTyping(false)
+    }, 1000 + Math.random() * 800)
+  }
+
+  // Ingen valgt samtale
+  if (!matchId) {
+    return (
+      <Layout title="Meldinger">
+        <div className="empty" style={{ marginTop: 40 }}>
+          <MessageCircle size={42} style={{ marginBottom: 12, opacity: 0.35 }} />
+          <h3>Ingen samtale valgt</h3>
+          <p style={{ marginTop: 8 }}>Gå til Venner og trykk på meldingsikonet.</p>
+          <button className="btn" style={{ marginTop: 20, maxWidth: 240 }}
+            onClick={() => navigate('/matches')}>Til venner</button>
+        </div>
+      </Layout>
+    )
+  }
+
+  if (loading) return <Layout title="Meldinger"><p className="hint" style={{ padding: 20 }}>Laster …</p></Layout>
+  if (!match)  return <Layout title="Meldinger"><p className="hint" style={{ padding: 20 }}>Fant ikke samtalen.</p></Layout>
+
+  return (
+    <div className="phone">
+      <BottomNav />
+      <div className="chat-layout">
+        <header className="chat-header">
+          <button className="chat-back" onClick={() => navigate('/matches')}>
+            <ChevronLeft size={22} />
+          </button>
+          <img src={match.photo} alt={match.name} className="chat-avatar" />
+          <div className="chat-header-info">
+            <strong>{match.name}</strong>
+            <span>{match.city}</span>
+          </div>
+        </header>
+
+        <div className="chat-messages">
+          {messages.length === 0 && (
+            <p className="chat-empty">Si hei til {match.name}! 👋</p>
+          )}
+          {messages.map(msg => (
+            <div key={msg.id} className={`bubble ${msg.from === user.uid ? 'mine' : 'theirs'}`}>
+              {msg.text}
+            </div>
+          ))}
+          {typing && (
+            <div className="bubble theirs typing">
+              <span /><span /><span />
+            </div>
+          )}
+          <div ref={bottomRef} />
+        </div>
+
+        <form className="chat-input-bar" onSubmit={handleSend}>
+          <input
+            value={text}
+            onChange={e => setText(e.target.value)}
+            placeholder={`Melding til ${match.name} …`}
+            autoComplete="off"
+          />
+          <button type="submit" className="chat-send" disabled={!text.trim()}>
+            <Send size={18} />
+          </button>
+        </form>
+      </div>
+    </div>
+  )
+}

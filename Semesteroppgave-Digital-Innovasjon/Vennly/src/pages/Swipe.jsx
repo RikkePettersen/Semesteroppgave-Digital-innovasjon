@@ -1,46 +1,110 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { X, Heart, ShieldCheck, GraduationCap, MapPin, RotateCcw } from 'lucide-react'
+import { X, Heart, ShieldCheck, GraduationCap, MapPin, RotateCcw, Navigation } from 'lucide-react'
 import Layout from '../components/Layout'
 import { useAuth } from '../context/AuthContext'
 import { SAMPLE_PROFILES } from '../data/sampleProfiles'
 import { addMatch } from '../lib/matches'
+import { getDistance, formatDistance } from '../lib/location'
 
 const SWIPE_THRESHOLD = 110
 
 export default function Swipe() {
   const { profile, user } = useAuth()
   const navigate = useNavigate()
-  const [deck, setDeck] = useState([])
+  const [deck,    setDeck]    = useState([])
+  const [nearby,  setNearby]  = useState([])   // folk i nærheten-seksjon
   const [matched, setMatched] = useState(null)
+  const [filter,  setFilter]  = useState('alle') // 'alle' | 'nærheten'
+
+  const userCoords  = profile?.coords      || null
+  const maxDistance = profile?.maxDistance ?? 200
 
   useEffect(() => {
     const mine = profile?.interests || []
-    const sorted = [...SAMPLE_PROFILES].sort((a, b) =>
+
+    const withDistance = SAMPLE_PROFILES.map(p => ({
+      ...p,
+      distance: userCoords && p.coords
+        ? getDistance(userCoords.lat, userCoords.lng, p.coords.lat, p.coords.lng)
+        : null,
+    }))
+
+    const sorted = [...withDistance].sort((a, b) =>
       overlap(b.interests, mine) - overlap(a.interests, mine)
     )
+
     setDeck(sorted)
+    setNearby(withDistance.filter(p => p.distance !== null && p.distance <= 50).sort((a, b) => a.distance - b.distance))
   }, [profile])
 
-  const top = deck[0]
+  const activeDeck = filter === 'nærheten'
+    ? deck.filter(p => p.distance !== null && p.distance <= (maxDistance === 200 ? Infinity : maxDistance))
+    : maxDistance < 200 && userCoords
+      ? deck.filter(p => p.distance === null || p.distance <= maxDistance)
+      : deck
+
+  const top = activeDeck[0]
 
   function handleDecision(liked) {
     if (!top) return
-    const shared = overlap(top.interests, profile?.interests || [])
+    const shared  = overlap(top.interests, profile?.interests || [])
     const isMatch = liked && (shared >= 2 || Math.random() > 0.4)
     if (isMatch) {
       addMatch(user.uid, top)
       setMatched(top)
     }
-    setDeck((d) => d.slice(1))
+    setDeck(d => d.filter(p => p.id !== top.id))
   }
 
   return (
     <Layout title="vennly">
+
+      {/* Folk i nærheten-banner */}
+      {nearby.length > 0 && (
+        <div className="nearby-banner">
+          <Navigation size={14} />
+          <span><strong>{nearby.length}</strong> folk i nærheten av deg</span>
+          <div className="nearby-avatars">
+            {nearby.slice(0, 4).map(p => (
+              <img key={p.id} src={p.photo} alt={p.name} className="nearby-avatar" />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Filter-tabs */}
+      {userCoords && (
+        <div className="filter-tabs">
+          <button
+            className={`filter-tab${filter === 'alle' ? ' active' : ''}`}
+            onClick={() => setFilter('alle')}
+          >Alle</button>
+          <button
+            className={`filter-tab${filter === 'nærheten' ? ' active' : ''}`}
+            onClick={() => setFilter('nærheten')}
+          >
+            <Navigation size={13} style={{ verticalAlign: -2, marginRight: 4 }} />
+            I nærheten
+          </button>
+        </div>
+      )}
+
+      {/* Posisjon ikke aktivert */}
+      {!userCoords && (
+        <button
+          className="loc-prompt"
+          onClick={() => navigate('/innstillinger')}
+        >
+          <Navigation size={14} />
+          Aktiver posisjon for å se avstand og folk i nærheten
+        </button>
+      )}
+
       {top ? (
         <>
           <div className="deck">
-            {deck.slice(0, 3).reverse().map((p, i, arr) => {
+            {activeDeck.slice(0, 3).reverse().map((p, i, arr) => {
               const isTop = i === arr.length - 1
               return (
                 <Card
@@ -66,10 +130,16 @@ export default function Swipe() {
       ) : (
         <div className="empty">
           <RotateCcw size={42} style={{ marginBottom: 12, opacity: 0.4 }} />
-          <h3>Ingen flere profiler akkurat nå</h3>
-          <p style={{ marginTop: 8 }}>Kom tilbake senere – nye studenter dukker opp hele tiden!</p>
-          <button className="btn" style={{ marginTop: 20 }}
-            onClick={() => setDeck([...SAMPLE_PROFILES])}>Vis profilene på nytt</button>
+          <h3>Ingen flere profiler</h3>
+          <p style={{ marginTop: 8 }}>
+            {filter === 'nærheten'
+              ? 'Ingen flere i nærheten. Prøv "Alle" for å se flere.'
+              : 'Kom tilbake senere – nye studenter dukker opp hele tiden!'}
+          </p>
+          {filter === 'nærheten'
+            ? <button className="btn" style={{ marginTop: 20 }} onClick={() => setFilter('alle')}>Vis alle</button>
+            : <button className="btn" style={{ marginTop: 20 }} onClick={() => setDeck([...SAMPLE_PROFILES])}>Vis profilene på nytt</button>
+          }
         </div>
       )}
 
@@ -86,10 +156,10 @@ export default function Swipe() {
 }
 
 function Card({ profile, draggable, onDecision, myInterests }) {
-  const ref = useRef(null)
+  const ref   = useRef(null)
   const start = useRef(null)
-  const [dragging, setDragging] = useState(false)
-  const [photoIdx, setPhotoIdx] = useState(0)
+  const [dragging,  setDragging]  = useState(false)
+  const [photoIdx,  setPhotoIdx]  = useState(0)
 
   const photos = profile.photos?.length ? profile.photos : [profile.photo]
 
@@ -98,10 +168,10 @@ function Card({ profile, draggable, onDecision, myInterests }) {
     if (!el) return
     const rot = dx / 18
     el.style.transition = animate ? 'transform 0.3s ease' : 'none'
-    el.style.transform = `translate(${dx}px, ${dy}px) rotate(${rot}deg)`
+    el.style.transform  = `translate(${dx}px, ${dy}px) rotate(${rot}deg)`
     const like = el.querySelector('.stamp.like')
     const nope = el.querySelector('.stamp.nope')
-    if (like) like.style.opacity = Math.max(0, Math.min(1, dx / SWIPE_THRESHOLD))
+    if (like) like.style.opacity = Math.max(0, Math.min(1,  dx / SWIPE_THRESHOLD))
     if (nope) nope.style.opacity = Math.max(0, Math.min(1, -dx / SWIPE_THRESHOLD))
   }
 
@@ -121,7 +191,7 @@ function Card({ profile, draggable, onDecision, myInterests }) {
   function onUp(e) {
     if (!start.current) return
     const point = e.changedTouches ? e.changedTouches[0] : e
-    const dx = point.clientX - start.current.x
+    const dx    = point.clientX - start.current.x
     const absDx = Math.abs(dx)
     const absDy = Math.abs(point.clientY - start.current.y)
     start.current = null
@@ -135,11 +205,8 @@ function Card({ profile, draggable, onDecision, myInterests }) {
       const rect = ref.current?.getBoundingClientRect()
       if (rect) {
         const relX = point.clientX - rect.left
-        if (relX < rect.width / 2) {
-          setPhotoIdx(i => Math.max(0, i - 1))
-        } else {
-          setPhotoIdx(i => Math.min(photos.length - 1, i + 1))
-        }
+        if (relX < rect.width / 2) setPhotoIdx(i => Math.max(0, i - 1))
+        else                        setPhotoIdx(i => Math.min(photos.length - 1, i + 1))
       }
     } else {
       setTransform(0, 0, true)
@@ -148,17 +215,15 @@ function Card({ profile, draggable, onDecision, myInterests }) {
 
   useEffect(() => {
     if (!dragging) return
-    const move = (e) => onMove(e)
-    const up = (e) => onUp(e)
-    window.addEventListener('mousemove', move)
-    window.addEventListener('mouseup', up)
-    window.addEventListener('touchmove', move, { passive: false })
-    window.addEventListener('touchend', up)
+    window.addEventListener('mousemove', onMove)
+    window.addEventListener('mouseup',   onUp)
+    window.addEventListener('touchmove', onMove, { passive: false })
+    window.addEventListener('touchend',  onUp)
     return () => {
-      window.removeEventListener('mousemove', move)
-      window.removeEventListener('mouseup', up)
-      window.removeEventListener('touchmove', move)
-      window.removeEventListener('touchend', up)
+      window.removeEventListener('mousemove', onMove)
+      window.removeEventListener('mouseup',   onUp)
+      window.removeEventListener('touchmove', onMove)
+      window.removeEventListener('touchend',  onUp)
     }
   }, [dragging])
 
@@ -178,6 +243,13 @@ function Card({ profile, draggable, onDecision, myInterests }) {
           {photos.map((_, i) => (
             <span key={i} className={`photo-dot${i === photoIdx ? ' active' : ''}`} />
           ))}
+        </div>
+      )}
+
+      {/* Avstandsmerke */}
+      {profile.distance !== null && profile.distance !== undefined && (
+        <div className="distance-badge">
+          <Navigation size={11} /> {formatDistance(profile.distance)}
         </div>
       )}
 
@@ -216,18 +288,14 @@ function MatchOverlay({ me, them, onClose, onMessage }) {
         <img src={me?.photo} alt="Deg" />
         <img src={them.photo} alt={them.name} />
       </div>
-      <h2>Det er en match! 🎉</h2>
-      <p>Du og {them.name} liker hverandre.</p>
-      <button className="btn" style={{ maxWidth: 280 }} onClick={onMessage}>
-        Send en melding
-      </button>
-      <button className="btn btn-ghost" style={{ maxWidth: 280, marginTop: 10 }} onClick={onClose}>
-        Fortsett å sveipe
-      </button>
+      <h2>Ny connection! 🎉</h2>
+      <p>Du og {them.name} vil bli kjent.</p>
+      <button className="btn" style={{ maxWidth: 280 }} onClick={onMessage}>Send en melding</button>
+      <button className="btn btn-ghost" style={{ maxWidth: 280, marginTop: 10 }} onClick={onClose}>Fortsett å sveipe</button>
     </div>
   )
 }
 
 function overlap(a = [], b = []) {
-  return a.filter((x) => b.includes(x)).length
+  return a.filter(x => b.includes(x)).length
 }

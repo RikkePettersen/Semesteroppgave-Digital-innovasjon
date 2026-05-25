@@ -38,17 +38,28 @@ function wordCount(text) {
 }
 
 export default function Profile() {
-  const { profile, saveProfile } = useAuth()
+  const { profile, saveProfile, logout } = useAuth()
   const navigate = useNavigate()
   const [editing, setEditing] = useState(false)
   const [draft, setDraft] = useState(profile || {})
   const [saving, setSaving] = useState(false)
+  const [saveError, setSaveError] = useState(null)
   const [uploadingPhoto, setUploadingPhoto] = useState(false)
   const [heroIdx, setHeroIdx] = useState(0)
   const [photoSlotIndex, setPhotoSlotIndex] = useState(null)
   const photoInputRef = useRef(null)
 
-  if (!profile) return <Layout title="Profil"><p>Laster …</p></Layout>
+  if (!profile) return (
+    <Layout title="Profil">
+      <div className="empty" style={{ marginTop: 40 }}>
+        <p style={{ marginBottom: 16 }}>Profilen din ble ikke funnet i databasen.</p>
+        <p style={{ fontSize: '0.88rem', color: 'var(--muted)', marginBottom: 20 }}>
+          Dette skjer hvis du registrerte deg i demo-modus. Logg ut og opprett ny konto.
+        </p>
+        <button className="btn btn-outline" onClick={logout} style={{ maxWidth: 240 }}>Logg ut</button>
+      </div>
+    </Layout>
+  )
 
   const viewPhotos = profile.photos?.length ? profile.photos : [profile.photo].filter(Boolean)
   const editPhotos = draft.photos?.length ? draft.photos : [draft.photo].filter(Boolean)
@@ -86,7 +97,7 @@ export default function Profile() {
       } else if (current.length < 5) {
         current.push(compressed)
       }
-      const newPhotos = current.slice(0, 5)
+      const newPhotos = current.slice(0, 6)
       setDraft(d => ({ ...d, photos: newPhotos, photo: newPhotos[0] }))
       await saveProfile({ photos: newPhotos, photo: newPhotos[0] })
     } finally {
@@ -109,19 +120,25 @@ export default function Profile() {
   async function save() {
     if (bioOver) return
     setSaving(true)
-    await saveProfile({
-      name: draft.name,
-      age: Number(draft.age),
-      city: draft.city,
-      study: draft.study,
-      bio: draft.bio || '',
-      interests: draft.interests || [],
-      photos: draft.photos || [],
-      photo: (draft.photos || [])[0] || draft.photo || '',
-    })
-    setSaving(false)
-    setEditing(false)
-    setHeroIdx(0)
+    setSaveError(null)
+    try {
+      await saveProfile({
+        name: draft.name,
+        age: Number(draft.age),
+        city: draft.city,
+        study: draft.study,
+        bio: draft.bio || '',
+        interests: draft.interests || [],
+        photos: (draft.photos || []).slice(0, 6),
+        photo: (draft.photos || [])[0] || draft.photo || '',
+      })
+      setEditing(false)
+      setHeroIdx(0)
+    } catch (err) {
+      setSaveError('Kunne ikke lagre. Prøv igjen.')
+    } finally {
+      setSaving(false)
+    }
   }
 
   const action = (
@@ -209,12 +226,12 @@ export default function Profile() {
         <>
           <h1 className="screen-title">Rediger profil</h1>
 
-          <div className="section-title">Bilder ({editPhotos.length}/5)</div>
+          <div className="section-title">Bilder ({editPhotos.length}/6)</div>
           <div className="photo-grid">
-            {Array.from({ length: 5 }).map((_, i) => (
+            {Array.from({ length: 6 }).map((_, i) => (
               <div
                 key={i}
-                className={`photo-slot${editPhotos[i] ? ' filled' : ''}${i === 0 ? ' main-slot' : ''}`}
+                className={`photo-slot${editPhotos[i] ? ' filled' : ''}`}
                 onClick={() => !editPhotos[i] && openSlot(i)}
               >
                 {editPhotos[i] ? (
@@ -295,6 +312,7 @@ export default function Profile() {
             </div>
           </div>
 
+          {saveError && <p className="error">{saveError}</p>}
           <div style={{ display: 'flex', gap: 10, marginTop: 8 }}>
             <button className="btn btn-ghost" style={{ flex: 1 }} onClick={() => setEditing(false)}>Avbryt</button>
             <button className="btn" style={{ flex: 2 }} disabled={saving || bioOver} onClick={save}>

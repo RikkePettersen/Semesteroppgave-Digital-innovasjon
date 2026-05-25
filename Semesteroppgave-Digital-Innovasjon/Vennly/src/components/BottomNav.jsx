@@ -3,7 +3,7 @@ import { Handshake, Heart, MessageCircle, CalendarDays, User } from 'lucide-reac
 
 const items = [
   { to: '/swipe',         label: 'Oppdag',    Icon: Handshake },
-  { to: '/matches',       label: 'Matcher',   Icon: Heart },
+  { to: '/matches',       label: 'Venner',    Icon: Heart },
   { to: '/chat',          label: 'Meldinger', Icon: MessageCircle },
   { to: '/arrangementer', label: 'Skjer',     Icon: CalendarDays },
   { to: '/profil',        label: 'Profil',    Icon: User },

@@ -190,9 +190,11 @@ export default function Auth() {
 function oversettFeil(err) {
   const code = err?.code || ''
   if (code.includes('email-already-in-use')) return 'E-posten er allerede i bruk.'
-  if (code.includes('invalid-email')) return 'Ugyldig e-postadresse.'
-  if (code.includes('weak-password')) return 'Passordet er for svakt (minst 6 tegn).'
+  if (code.includes('invalid-email'))        return 'Ugyldig e-postadresse.'
+  if (code.includes('weak-password'))        return 'Passordet er for svakt (minst 6 tegn).'
   if (code.includes('user-not-found') || code.includes('wrong-password') || code.includes('invalid-credential'))
-    return 'Feil e-post eller passord.'
+    return 'Feil e-post eller passord. Hvis du registrerte deg i demo-modus (uten Firebase) må du opprette ny konto.'
+  if (code.includes('network-request-failed')) return 'Nettverksfeil – sjekk internettforbindelsen.'
+  if (code.includes('too-many-requests'))      return 'For mange forsøk. Vent litt og prøv igjen.'
   return err?.message || 'Noe gikk galt. Prøv igjen.'
 }
