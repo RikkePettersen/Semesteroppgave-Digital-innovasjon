@@ -70,7 +70,7 @@ export default function Swipe() {
 
       const matchedIds = new Set(matches.map(m => m.id))
       const seenIds    = getSeenIds(user.uid)
-      const excluded   = new Set([...matchedIds, ...seenIds])
+      const excluded   = new Set([...matchedIds, ...seenIds, user.uid])
 
       const allProfiles = [
         ...realUsers,
