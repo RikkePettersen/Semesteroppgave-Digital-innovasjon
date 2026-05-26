@@ -6,7 +6,6 @@ import Swipe from './pages/Swipe'
 import Matches from './pages/Matches'
 import Profile from './pages/Profile'
 import Settings from './pages/Settings'
-import Placeholder from './pages/Placeholder'
 import Events from './pages/Events'
 import Chat from './pages/Chat'
 
