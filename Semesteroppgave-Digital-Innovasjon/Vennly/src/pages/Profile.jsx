@@ -285,9 +285,20 @@ export default function Profile() {
           </div>
           <div className="field">
             <label>Studieprogram</label>
-            <select value={draft.study} onChange={(e) => setDraft({ ...draft, study: e.target.value })}>
+            <select
+              value={STUDY_PROGRAMS.includes(draft.study) ? draft.study : 'Annet'}
+              onChange={(e) => setDraft({ ...draft, study: e.target.value === 'Annet' ? '' : e.target.value })}
+            >
               {STUDY_PROGRAMS.map((s) => <option key={s}>{s}</option>)}
             </select>
+            {!STUDY_PROGRAMS.filter(s => s !== 'Annet').includes(draft.study) && (
+              <input
+                style={{ marginTop: 8 }}
+                placeholder="Skriv studieprogram her …"
+                value={draft.study === 'Annet' ? '' : draft.study || ''}
+                onChange={(e) => setDraft({ ...draft, study: e.target.value })}
+              />
+            )}
           </div>
           <div className="field">
             <label>Om meg</label>

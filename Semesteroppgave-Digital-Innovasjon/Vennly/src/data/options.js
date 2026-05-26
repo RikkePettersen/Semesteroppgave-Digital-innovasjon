@@ -9,6 +9,7 @@ export const STUDY_PROGRAMS = [
   'Informatikk', 'Sykepleie', 'Økonomi og administrasjon', 'Jus',
   'Psykologi', 'Lærerutdanning', 'Ingeniør', 'Medisin',
   'Markedsføring', 'Design', 'Statsvitenskap', 'Biologi',
+  'Annet',
 ]
 
 export const INTERESTS = [

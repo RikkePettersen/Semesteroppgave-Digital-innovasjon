@@ -24,6 +24,7 @@ export default function Auth() {
   const [age, setAge] = useState('')
   const [city, setCity] = useState(CITIES[0])
   const [study, setStudy] = useState(STUDY_PROGRAMS[0])
+  const [customStudy, setCustomStudy] = useState('')
   const [interests, setInterests] = useState([])
 
   const studentEmail = isStudentEmail(email)
@@ -50,7 +51,7 @@ export default function Auth() {
     setError(''); setBusy(true)
     try {
       await register(email, password, {
-        name, age: Number(age), city, study, interests,
+        name, age: Number(age), city, study: study === 'Annet' ? customStudy.trim() || 'Annet' : study, interests,
         photo: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=600&q=80',
       })
       navigate('/swipe')
@@ -155,6 +156,14 @@ export default function Auth() {
               <select value={study} onChange={(e) => setStudy(e.target.value)}>
                 {STUDY_PROGRAMS.map((s) => <option key={s}>{s}</option>)}
               </select>
+              {study === 'Annet' && (
+                <input
+                  style={{ marginTop: 8 }}
+                  placeholder="Skriv studieprogram her …"
+                  value={customStudy}
+                  onChange={(e) => setCustomStudy(e.target.value)}
+                />
+              )}
             </div>
 
             <div className="field">
