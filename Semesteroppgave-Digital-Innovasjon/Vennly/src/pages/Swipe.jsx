@@ -1,14 +1,42 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { X, Heart, ShieldCheck, GraduationCap, MapPin, RotateCcw, Navigation } from 'lucide-react'
+import { collection, getDocs } from 'firebase/firestore'
 import Layout from '../components/Layout'
 import { useAuth } from '../context/AuthContext'
+import { db, isFirebaseConfigured } from '../firebase'
 import { SAMPLE_PROFILES } from '../data/sampleProfiles'
 import { addMatch, getMatches } from '../lib/matches'
 import { getDistance, formatDistance } from '../lib/location'
 
 const SWIPE_THRESHOLD = 110
 const seenKey = (uid) => `vennly_seen_${uid}`
+
+async function fetchRealUsers(currentUid) {
+  if (!isFirebaseConfigured) return []
+  try {
+    const snap = await getDocs(collection(db, 'users'))
+    return snap.docs
+      .map(d => d.data())
+      .filter(u => u.uid !== currentUid && u.name && u.age)
+      .map(u => ({
+        id:        u.uid,
+        name:      u.name,
+        age:       u.age,
+        city:      u.city       || '',
+        study:     u.study      || '',
+        bio:       u.bio        || '',
+        interests: u.interests  || [],
+        photo:     u.photo      || '',
+        photos:    u.photos     || (u.photo ? [u.photo] : []),
+        coords:    u.coords     || null,
+        verified:  u.verifiedStudent || false,
+        isRealUser: true,
+      }))
+  } catch {
+    return []
+  }
+}
 
 function getSeenIds(uid) {
   return new Set(JSON.parse(localStorage.getItem(seenKey(uid)) || '[]'))
@@ -34,12 +62,22 @@ export default function Swipe() {
     if (!user) return
     const mine = profile?.interests || []
 
-    getMatches(user.uid).then(matches => {
+    async function buildDeck() {
+      const [matches, realUsers] = await Promise.all([
+        getMatches(user.uid),
+        fetchRealUsers(user.uid),
+      ])
+
       const matchedIds = new Set(matches.map(m => m.id))
       const seenIds    = getSeenIds(user.uid)
       const excluded   = new Set([...matchedIds, ...seenIds])
 
-      const withDistance = SAMPLE_PROFILES
+      const allProfiles = [
+        ...realUsers,
+        ...SAMPLE_PROFILES.filter(p => !realUsers.find(r => r.id === p.id)),
+      ]
+
+      const withDistance = allProfiles
         .filter(p => !excluded.has(p.id))
         .map(p => ({
           ...p,
@@ -58,7 +96,9 @@ export default function Swipe() {
           .filter(p => p.distance !== null && p.distance <= 50)
           .sort((a, b) => a.distance - b.distance)
       )
-    })
+    }
+
+    buildDeck()
   }, [user, profile])
 
   const activeDeck = filter === 'nærheten'
