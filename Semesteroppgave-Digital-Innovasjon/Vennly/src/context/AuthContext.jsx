@@ -135,10 +135,11 @@ export function AuthProvider({ children }) {
     }
 
     if (Object.keys(firestoreFields).length > 0) {
+      const { photos: _p, photo: _ph, ...mergedForFirestore } = merged
       try {
         await updateDoc(doc(db, 'users', user.uid), firestoreFields)
       } catch {
-        await setDoc(doc(db, 'users', user.uid), { ...merged, photos: undefined, photo: undefined })
+        await setDoc(doc(db, 'users', user.uid), mergedForFirestore)
       }
     }
   }
