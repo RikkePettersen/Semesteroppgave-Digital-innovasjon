@@ -22,7 +22,7 @@ export const SAMPLE_PROFILES = [
     photo: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=600&q=80',
     photos: [
       'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=600&q=80',
-      'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=600&q=80',
+      'https://static.wixstatic.com/media/f86706_8f325a15b07b42adab10b0fa0bf0b14b~mv2.jpg/v1/fill/w_568,h_852,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/f86706_8f325a15b07b42adab10b0fa0bf0b14b~mv2.jpg',
       'https://images.unsplash.com/photo-1511497584788-876760111969?w=600&q=80',
     ],
     verified: true,
