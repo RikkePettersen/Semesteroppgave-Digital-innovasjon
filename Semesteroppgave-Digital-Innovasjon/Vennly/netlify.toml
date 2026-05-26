@@ -1,0 +1,9 @@
+[build]
+  base    = "Semesteroppgave-Digital-Innovasjon/Vennly"
+  command = "npm run build"
+  publish = "Semesteroppgave-Digital-Innovasjon/Vennly/dist"
+
+[[redirects]]
+  from   = "/*"
+  to     = "/index.html"
+  status = 200
