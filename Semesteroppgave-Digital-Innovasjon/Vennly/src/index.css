@@ -656,7 +656,7 @@ input, select, textarea { font-family: inherit; font-size: 1rem; }
 }
 .photo-slot:hover  { border-color: var(--gold); }
 .photo-slot.filled { border: none; cursor: default; }
-.photo-slot img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.photo-slot img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
 .slot-add { font-size: 2rem; color: var(--gold); line-height: 1; }
 .slot-actions {
   position: absolute; bottom: 6px; right: 6px;
