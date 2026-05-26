@@ -4,6 +4,7 @@ import {
   signInWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
+  sendEmailVerification,
 } from 'firebase/auth'
 import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore'
 import { auth, db, isFirebaseConfigured } from '../firebase'
@@ -75,6 +76,7 @@ export function AuthProvider({ children }) {
     }
 
     const cred = await createUserWithEmailAndPassword(auth, email, password)
+    await sendEmailVerification(cred.user)
     const newProfile = {
       uid: cred.user.uid,
       email,
@@ -151,9 +153,14 @@ export function AuthProvider({ children }) {
     }
   }
 
+  async function resendVerificationEmail() {
+    if (auth.currentUser) await sendEmailVerification(auth.currentUser)
+  }
+
   const value = {
     user, profile, loading,
     register, login, logout, saveProfile,
+    resendVerificationEmail,
     isFirebaseConfigured,
   }
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

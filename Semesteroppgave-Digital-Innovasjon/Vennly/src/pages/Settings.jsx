@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   ArrowLeft, Bell, Moon, MapPin, ShieldAlert, Eye, LogOut, Crown,
-  Navigation, Loader,
+  Navigation, Loader, MailCheck, MailX,
 } from 'lucide-react'
 import Layout from '../components/Layout'
 import { useAuth } from '../context/AuthContext'
@@ -177,6 +177,14 @@ export default function Settings() {
         <div className="row">
           <span className="label">E-post</span>
           <span className="val" style={{ fontSize: '0.88rem' }}>{user?.email}</span>
+        </div>
+        <div className="row">
+          <span className="label">E-post verifisert</span>
+          <span className="val" style={{ color: user?.emailVerified ? 'var(--like)' : 'var(--nope)', fontWeight: 600 }}>
+            {user?.emailVerified
+              ? <><MailCheck size={15} style={{ verticalAlign: -2 }} /> Ja</>
+              : <><MailX size={15} style={{ verticalAlign: -2 }} /> Nei</>}
+          </span>
         </div>
         <div className="row">
           <span className="label"><Crown size={18} /> Vennly Plus</span>

@@ -988,5 +988,10 @@ input, select, textarea { font-family: inherit; font-size: 1rem; }
 .center { text-align: center; }
 .spinner-wrap { min-height: 100vh; min-height: 100dvh; display: flex; align-items: center; justify-content: center; background: var(--yellow); color: var(--gold); font-weight: 700; font-size: 1.5rem; }
 .demo-banner  { background: var(--cream); color: #8a6320; font-size: 0.78rem; padding: 8px 14px; text-align: center; border-bottom: 1px solid #ecdcae; }
+.verify-banner { display: flex; align-items: center; gap: 8px; background: #fff3cd; color: #856404; font-size: 0.78rem; padding: 8px 14px; border-bottom: 1px solid #ffc107; flex-wrap: wrap; }
+.verify-banner span { flex: 1; min-width: 0; }
+.verify-resend { background: none; border: 1px solid #856404; border-radius: 6px; color: #856404; font-size: 0.75rem; padding: 2px 8px; cursor: pointer; white-space: nowrap; }
+.verify-resend:hover { background: #856404; color: #fff; }
+.verify-sent { font-weight: 700; color: #198754; white-space: nowrap; }
 
 @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
