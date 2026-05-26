@@ -5,6 +5,7 @@ import {
   signOut,
   onAuthStateChanged,
   sendEmailVerification,
+  sendPasswordResetEmail,
 } from 'firebase/auth'
 import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore'
 import { auth, db, isFirebaseConfigured } from '../firebase'
@@ -157,10 +158,15 @@ export function AuthProvider({ children }) {
     if (auth.currentUser) await sendEmailVerification(auth.currentUser)
   }
 
+  async function resetPassword(email) {
+    if (!isFirebaseConfigured) throw new Error('Ikke tilgjengelig i demo-modus.')
+    await sendPasswordResetEmail(auth, email)
+  }
+
   const value = {
     user, profile, loading,
     register, login, logout, saveProfile,
-    resendVerificationEmail,
+    resendVerificationEmail, resetPassword,
     isFirebaseConfigured,
   }
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

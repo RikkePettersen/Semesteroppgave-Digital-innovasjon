@@ -7,13 +7,14 @@ import { CITIES, STUDY_PROGRAMS, INTERESTS, isStudentEmail } from '../data/optio
 // Kombinert innlogging + registrering. Registrering går i to steg for å unngå
 // å overvelde brukeren (reduserer kognitiv belastning – designprinsipp).
 export default function Auth() {
-  const { login, register } = useAuth()
+  const { login, register, resetPassword } = useAuth()
   const navigate = useNavigate()
 
-  const [mode, setMode] = useState('login')   // 'login' | 'register'
+  const [mode, setMode] = useState('login')   // 'login' | 'register' | 'reset'
   const [step, setStep] = useState(1)
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
+  const [resetSent, setResetSent] = useState(false)
 
   // Felles felt
   const [email, setEmail] = useState('')
@@ -41,6 +42,17 @@ export default function Auth() {
     try {
       await login(email, password)
       navigate('/swipe')
+    } catch (err) {
+      setError(oversettFeil(err))
+    } finally { setBusy(false) }
+  }
+
+  async function handleReset(e) {
+    e.preventDefault()
+    setError(''); setBusy(true)
+    try {
+      await resetPassword(email)
+      setResetSent(true)
     } catch (err) {
       setError(oversettFeil(err))
     } finally { setBusy(false) }
@@ -88,11 +100,57 @@ export default function Auth() {
               {busy ? 'Logger inn …' : 'Logg inn'}
             </button>
             <p className="auth-switch">
+              <button type="button" onClick={() => { setMode('reset'); setError(''); setResetSent(false) }}>
+                Glemt passord?
+              </button>
+            </p>
+            <p className="auth-switch">
               Ny her?{' '}
               <button type="button" onClick={() => { setMode('register'); setStep(1); setError('') }}>
                 Lag konto
               </button>
             </p>
+          </form>
+        )}
+
+        {/* ---------------- GLEMT PASSORD ---------------- */}
+        {mode === 'reset' && (
+          <form onSubmit={handleReset}>
+            <h3 style={{ marginBottom: 8, fontSize: '1.1rem' }}>Tilbakestill passord</h3>
+            <p style={{ fontSize: '0.85rem', color: 'var(--muted)', marginBottom: 14 }}>
+              Skriv inn e-posten din, så sender vi en lenke for å lage nytt passord.
+            </p>
+
+            {resetSent ? (
+              <div style={{ textAlign: 'center', padding: '12px 0' }}>
+                <p style={{ fontWeight: 700, color: 'var(--like)', marginBottom: 8 }}>E-post sendt!</p>
+                <p style={{ fontSize: '0.85rem', color: 'var(--muted)', marginBottom: 16 }}>
+                  Sjekk innboksen din (og søppelpost) for en lenke til å lage nytt passord.
+                </p>
+                <button type="button" className="btn btn-outline"
+                  onClick={() => { setMode('login'); setResetSent(false) }}>
+                  Tilbake til innlogging
+                </button>
+              </div>
+            ) : (
+              <>
+                <div className="field">
+                  <label>E-post</label>
+                  <input type="email" value={email} required
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="din@student.no" />
+                </div>
+                {error && <p className="error">{error}</p>}
+                <button className="btn" disabled={busy || !email}>
+                  {busy ? 'Sender …' : 'Send tilbakestillingslenke'}
+                </button>
+                <p className="auth-switch">
+                  <button type="button" onClick={() => { setMode('login'); setError('') }}>
+                    Tilbake til innlogging
+                  </button>
+                </p>
+              </>
+            )}
           </form>
         )}
 
