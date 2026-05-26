@@ -10,7 +10,7 @@ import { CITIES } from '../data/options'
 import { getCurrentPosition, reverseGeocode, fuzzyCoords } from '../lib/location'
 
 export default function Settings() {
-  const { profile, saveProfile, logout } = useAuth()
+  const { profile, user, saveProfile, logout } = useAuth()
   const navigate = useNavigate()
 
   const [notifications,    setNotifications]    = useState(profile?.notifications    ?? true)
@@ -171,9 +171,13 @@ export default function Settings() {
         </div>
       </div>
 
-      {/* ---- Medlemskap ---- */}
-      <div className="section-title">Medlemskap</div>
+      {/* ---- Konto ---- */}
+      <div className="section-title">Konto</div>
       <div className="card-box">
+        <div className="row">
+          <span className="label">E-post</span>
+          <span className="val" style={{ fontSize: '0.88rem' }}>{user?.email}</span>
+        </div>
         <div className="row">
           <span className="label"><Crown size={18} /> Vennly Plus</span>
           <span className="val">{profile?.plus ? 'Aktiv 👑' : 'Ikke aktiv'}</span>
