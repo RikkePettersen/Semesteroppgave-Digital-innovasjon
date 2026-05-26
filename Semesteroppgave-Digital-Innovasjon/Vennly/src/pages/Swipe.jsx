@@ -4,39 +4,62 @@ import { X, Heart, ShieldCheck, GraduationCap, MapPin, RotateCcw, Navigation } f
 import Layout from '../components/Layout'
 import { useAuth } from '../context/AuthContext'
 import { SAMPLE_PROFILES } from '../data/sampleProfiles'
-import { addMatch } from '../lib/matches'
+import { addMatch, getMatches } from '../lib/matches'
 import { getDistance, formatDistance } from '../lib/location'
 
 const SWIPE_THRESHOLD = 110
+const seenKey = (uid) => `vennly_seen_${uid}`
+
+function getSeenIds(uid) {
+  return new Set(JSON.parse(localStorage.getItem(seenKey(uid)) || '[]'))
+}
+function markSeen(uid, id) {
+  const seen = getSeenIds(uid)
+  seen.add(id)
+  localStorage.setItem(seenKey(uid), JSON.stringify([...seen]))
+}
 
 export default function Swipe() {
   const { profile, user } = useAuth()
   const navigate = useNavigate()
   const [deck,    setDeck]    = useState([])
-  const [nearby,  setNearby]  = useState([])   // folk i nærheten-seksjon
+  const [nearby,  setNearby]  = useState([])
   const [matched, setMatched] = useState(null)
-  const [filter,  setFilter]  = useState('alle') // 'alle' | 'nærheten'
+  const [filter,  setFilter]  = useState('alle')
 
   const userCoords  = profile?.coords      || null
   const maxDistance = profile?.maxDistance ?? 200
 
   useEffect(() => {
+    if (!user) return
     const mine = profile?.interests || []
 
-    const withDistance = SAMPLE_PROFILES.map(p => ({
-      ...p,
-      distance: userCoords && p.coords
-        ? getDistance(userCoords.lat, userCoords.lng, p.coords.lat, p.coords.lng)
-        : null,
-    }))
+    getMatches(user.uid).then(matches => {
+      const matchedIds = new Set(matches.map(m => m.id))
+      const seenIds    = getSeenIds(user.uid)
+      const excluded   = new Set([...matchedIds, ...seenIds])
 
-    const sorted = [...withDistance].sort((a, b) =>
-      overlap(b.interests, mine) - overlap(a.interests, mine)
-    )
+      const withDistance = SAMPLE_PROFILES
+        .filter(p => !excluded.has(p.id))
+        .map(p => ({
+          ...p,
+          distance: userCoords && p.coords
+            ? getDistance(userCoords.lat, userCoords.lng, p.coords.lat, p.coords.lng)
+            : null,
+        }))
 
-    setDeck(sorted)
-    setNearby(withDistance.filter(p => p.distance !== null && p.distance <= 50).sort((a, b) => a.distance - b.distance))
-  }, [profile])
+      const sorted = [...withDistance].sort((a, b) =>
+        overlap(b.interests, mine) - overlap(a.interests, mine)
+      )
+
+      setDeck(sorted)
+      setNearby(
+        withDistance
+          .filter(p => p.distance !== null && p.distance <= 50)
+          .sort((a, b) => a.distance - b.distance)
+      )
+    })
+  }, [user, profile])
 
   const activeDeck = filter === 'nærheten'
     ? deck.filter(p => p.distance !== null && p.distance <= (maxDistance === 200 ? Infinity : maxDistance))
@@ -48,6 +71,7 @@ export default function Swipe() {
 
   function handleDecision(liked) {
     if (!top) return
+    markSeen(user.uid, top.id)
     const shared  = overlap(top.interests, profile?.interests || [])
     const isMatch = liked && (shared >= 2 || Math.random() > 0.4)
     if (isMatch) {
@@ -138,7 +162,15 @@ export default function Swipe() {
           </p>
           {filter === 'nærheten'
             ? <button className="btn" style={{ marginTop: 20 }} onClick={() => setFilter('alle')}>Vis alle</button>
-            : <button className="btn" style={{ marginTop: 20 }} onClick={() => setDeck([...SAMPLE_PROFILES])}>Vis profilene på nytt</button>
+            : <button className="btn" style={{ marginTop: 20 }} onClick={() => {
+                localStorage.removeItem(seenKey(user.uid))
+                setDeck(SAMPLE_PROFILES.map(p => ({
+                  ...p,
+                  distance: userCoords && p.coords
+                    ? getDistance(userCoords.lat, userCoords.lng, p.coords.lat, p.coords.lng)
+                    : null,
+                })))
+              }}>Vis profilene på nytt</button>
           }
         </div>
       )}
