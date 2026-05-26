@@ -119,7 +119,13 @@ export function AuthProvider({ children }) {
     setProfile(merged)
 
     if (!isFirebaseConfigured) {
-      localStorage.setItem(DEMO_KEY, JSON.stringify(merged))
+      const { photos: _p, photo: _ph, ...demoWithoutPhotos } = merged
+      try {
+        localStorage.setItem(DEMO_KEY, JSON.stringify(merged))
+      } catch {
+        // Bilder overstiger trolig localStorage-kvoten – lagre uten bilder
+        localStorage.setItem(DEMO_KEY, JSON.stringify(demoWithoutPhotos))
+      }
       return
     }
 
@@ -127,11 +133,12 @@ export function AuthProvider({ children }) {
     // Lagre dem kun lokalt; send bare tekstfelt til databasen.
     const { photos, photo, ...firestoreFields } = updates
     if (photos !== undefined || photo !== undefined) {
-      const cachedPhotos = {
-        photos: merged.photos,
-        photo: merged.photo,
+      const cachedPhotos = { photos: merged.photos, photo: merged.photo }
+      try {
+        localStorage.setItem(`vennly_photos_${user.uid}`, JSON.stringify(cachedPhotos))
+      } catch {
+        throw new Error('Bildene er for store for lokal lagring. Prøv færre eller mindre bilder.')
       }
-      localStorage.setItem(`vennly_photos_${user.uid}`, JSON.stringify(cachedPhotos))
     }
 
     if (Object.keys(firestoreFields).length > 0) {

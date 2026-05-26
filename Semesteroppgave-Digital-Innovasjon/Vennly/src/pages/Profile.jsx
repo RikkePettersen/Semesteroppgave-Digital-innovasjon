@@ -8,7 +8,7 @@ import Layout from '../components/Layout'
 import { useAuth } from '../context/AuthContext'
 import { CITIES, STUDY_PROGRAMS, INTERESTS } from '../data/options'
 
-function compressImage(file, maxSize = 1200, quality = 0.92) {
+function compressImage(file, maxSize = 900, quality = 0.82) {
   return new Promise((resolve) => {
     const reader = new FileReader()
     reader.onload = (e) => {
@@ -44,6 +44,7 @@ export default function Profile() {
   const [draft, setDraft] = useState(profile || {})
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState(null)
+  const [photoError, setPhotoError] = useState(null)
   const [uploadingPhoto, setUploadingPhoto] = useState(false)
   const [heroIdx, setHeroIdx] = useState(0)
   const [photoSlotIndex, setPhotoSlotIndex] = useState(null)
@@ -89,17 +90,20 @@ export default function Profile() {
     const file = e.target.files?.[0]
     if (!file) return
     setUploadingPhoto(true)
+    setPhotoError(null)
     try {
       const compressed = await compressImage(file)
       const current = [...editPhotos]
       if (photoSlotIndex !== null && photoSlotIndex < current.length) {
         current[photoSlotIndex] = compressed
-      } else if (current.length < 5) {
+      } else if (current.length < 6) {
         current.push(compressed)
       }
       const newPhotos = current.slice(0, 6)
       setDraft(d => ({ ...d, photos: newPhotos, photo: newPhotos[0] }))
       await saveProfile({ photos: newPhotos, photo: newPhotos[0] })
+    } catch {
+      setPhotoError('Bildet kunne ikke lagres. Prøv et mindre bilde.')
     } finally {
       setUploadingPhoto(false)
       setPhotoSlotIndex(null)
@@ -254,6 +258,7 @@ export default function Profile() {
             ))}
           </div>
 
+          {photoError && <p className="error" style={{ marginTop: 4 }}>{photoError}</p>}
           {uploadingPhoto && (
             <p style={{ textAlign: 'center', color: 'var(--muted)', fontSize: '0.85rem', marginBottom: 12 }}>
               <Loader size={14} style={{ animation: 'spin 1s linear infinite', verticalAlign: -2, marginRight: 6 }} />
