@@ -1,7 +1,7 @@
 [build]
   base    = "Semesteroppgave-Digital-Innovasjon/Vennly"
   command = "npm run build"
-  publish = "Semesteroppgave-Digital-Innovasjon/Vennly/dist"
+  publish = "dist"
 
 [[redirects]]
   from   = "/*"
