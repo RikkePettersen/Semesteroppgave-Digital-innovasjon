@@ -43,7 +43,7 @@ export const SAMPLE_PROFILES = [
     id: 'p3', name: 'Alexander', age: 30, city: 'Tromsø',
     coords: CITY_COORDS['Tromsø'],
     study: 'Informatikk', year: 'Ferdig utdannet',
-    bio: 'Informatikkinteressert og sosial, alltid klar for en kaffe eller en god prat.',
+    bio: 'Liker gaming og sånt, alltid klar for en kaffe eller en god jam.',
     interests: ['Gaming', 'Kaffe', 'Teknologi', 'Musikk'],
     photo: 'https://0.academia-photos.com/145266219/89138647/77847335/s200_alexander.utne.jpeg',
     photos: [
