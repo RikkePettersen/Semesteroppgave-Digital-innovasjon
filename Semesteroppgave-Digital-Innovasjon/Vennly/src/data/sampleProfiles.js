@@ -93,4 +93,21 @@ export const SAMPLE_PROFILES = [
     ],
     verified: true,
   },
+    {
+    id: 'p7',
+    name: 'Kåre',
+    age: 30,
+    city: 'Tromsø',
+    coords: CITY_COORDS['Tromsø'],
+    study: 'Musikk',
+    year: 'Ferdig utdannet',
+    bio: 'Glad i musikk, reise, kaffe og fine turer i naturen.',
+    interests: ['Musikk', 'Reise', 'Kaffe', 'Natur'],
+    photo: 'https://vcdn.polarismedia.no/7fc4d752-1b66-4225-81f1-660a33f51cc6?fit=clip&q=80&tight=false&w=2000',
+    photos: [
+      'https://vcdn.polarismedia.no/7fc4d752-1b66-4225-81f1-660a33f51cc6?fit=clip&q=80&tight=false&w=2000',
+    ],
+    verified: true,
+  },
+
 ]
