@@ -91,7 +91,7 @@ export const SAMPLE_PROFILES = [
     ],
     verified: true,
   },
-    {
+  {
     id: 'p7',
     name: 'Kåre',
     age: 30,
