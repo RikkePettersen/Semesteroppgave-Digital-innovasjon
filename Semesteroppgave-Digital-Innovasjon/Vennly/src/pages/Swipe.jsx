@@ -124,7 +124,7 @@ export default function Swipe() {
   }
 
   return (
-    <Layout title="vennly">
+    <Layout title="Oppdag">
 
       {/* Folk i nærheten-banner */}
       {nearby.length > 0 && (
