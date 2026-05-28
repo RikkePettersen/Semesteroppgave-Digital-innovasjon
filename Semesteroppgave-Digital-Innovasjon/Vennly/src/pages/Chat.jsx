@@ -7,18 +7,6 @@ import { useAuth } from '../context/AuthContext'
 import { getMatches } from '../lib/matches'
 import { getMessages, saveMessage } from '../lib/messages'
 
-const RESPONSES = [
-  'Hei! Hyggelig å høre fra deg 😊',
-  'Ja, det hadde vært gøy!',
-  'Når passer det for deg?',
-  'Så kult!',
-  'La oss avtale noe snart 🙌',
-  'Høres bra ut! 😄',
-  'Det er jeg med på!',
-  'Haha ja! 😄',
-  'Gleder meg til å møte deg 👋',
-  'Absolutt, bare si fra!',
-]
 
 export default function Chat() {
   const { matchId } = useParams()
@@ -27,7 +15,6 @@ export default function Chat() {
   const [match, setMatch]     = useState(null)
   const [messages, setMessages] = useState([])
   const [text, setText]       = useState('')
-  const [typing, setTyping]   = useState(false)
   const [loading, setLoading] = useState(true)
   const bottomRef = useRef(null)
 
@@ -43,7 +30,7 @@ export default function Chat() {
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [messages, typing])
+  }, [messages])
 
   function handleSend(e) {
     e.preventDefault()
@@ -51,16 +38,6 @@ export default function Chat() {
     const msg = saveMessage(user.uid, matchId, text.trim(), user.uid)
     setMessages(prev => [...prev, msg])
     setText('')
-    setTyping(true)
-    setTimeout(() => {
-      const reply = saveMessage(
-        user.uid, matchId,
-        RESPONSES[Math.floor(Math.random() * RESPONSES.length)],
-        matchId,
-      )
-      setMessages(prev => [...prev, reply])
-      setTyping(false)
-    }, 1000 + Math.random() * 800)
   }
 
   // Ingen valgt samtale
