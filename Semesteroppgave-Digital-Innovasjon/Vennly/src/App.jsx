@@ -9,6 +9,7 @@ import Settings from './pages/Settings'
 import Events from './pages/Events'
 import Chat from './pages/Chat'
 import GroupChat from './pages/GroupChat'
+import Messages from './pages/Messages'
 
 // Beskytter ruter som krever innlogging.
 function Protected({ children }) {
@@ -36,7 +37,7 @@ export default function App() {
       <Route path="/profil" element={<Protected><Profile /></Protected>} />
       <Route path="/innstillinger" element={<Protected><Settings /></Protected>} />
 
-      <Route path="/chat"                  element={<Protected><Chat /></Protected>} />
+      <Route path="/meldinger"             element={<Protected><Messages /></Protected>} />
       <Route path="/chat/:matchId"         element={<Protected><Chat /></Protected>} />
       <Route path="/chat/gruppe/:groupId"  element={<Protected><GroupChat /></Protected>} />
       <Route path="/arrangementer" element={<Protected><Events /></Protected>} />

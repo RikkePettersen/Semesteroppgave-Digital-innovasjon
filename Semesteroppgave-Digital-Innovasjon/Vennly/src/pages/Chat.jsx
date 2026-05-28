@@ -63,7 +63,7 @@ export default function Chat() {
       <BottomNav />
       <div className="chat-layout">
         <header className="chat-header">
-          <button className="chat-back" onClick={() => navigate('/matches')}>
+          <button className="chat-back" onClick={() => navigate('/meldinger')}>
             <ChevronLeft size={22} />
           </button>
           <img src={match.photo} alt={match.name} className="chat-avatar" />

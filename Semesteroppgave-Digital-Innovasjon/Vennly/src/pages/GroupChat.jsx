@@ -65,7 +65,7 @@ export default function GroupChat() {
       <BottomNav />
       <div className="chat-layout">
         <header className="chat-header">
-          <button className="chat-back" onClick={() => navigate('/matches')}>
+          <button className="chat-back" onClick={() => navigate('/meldinger')}>
             <ChevronLeft size={22} />
           </button>
           <div className="group-avatar-stack">

@@ -1,16 +1,15 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Heart, MapPin, MessageCircle, Users, Plus, X, Check } from 'lucide-react'
+import { Heart, MapPin, MessageCircle, Plus, X, Check } from 'lucide-react'
 import Layout from '../components/Layout'
 import { useAuth } from '../context/AuthContext'
 import { getMatches } from '../lib/matches'
-import { getGroupChats, createGroupChat } from '../lib/groupChats'
+import { createGroupChat } from '../lib/groupChats'
 
 export default function Matches() {
   const { user, profile } = useAuth()
   const navigate = useNavigate()
   const [list,      setList]      = useState(null)
-  const [groups,    setGroups]    = useState([])
   const [showModal, setShowModal] = useState(false)
   const [groupName, setGroupName] = useState('')
   const [selected,  setSelected]  = useState([])
@@ -19,7 +18,6 @@ export default function Matches() {
   useEffect(() => {
     if (!user) return
     getMatches(user.uid).then(setList)
-    getGroupChats(user.uid).then(setGroups)
   }, [user])
 
   function toggleSelect(match) {
@@ -39,7 +37,6 @@ export default function Matches() {
       ...selected,
     ]
     const group = await createGroupChat(user.uid, groupName.trim(), allMembers)
-    setGroups(prev => [group, ...prev])
     setShowModal(false)
     setGroupName('')
     setSelected([])
@@ -62,7 +59,7 @@ export default function Matches() {
 
       {list === null && <p className="hint" style={{ marginTop: 16 }}>Laster …</p>}
 
-      {list && list.length === 0 && groups.length === 0 && (
+      {list && list.length === 0 && (
         <div className="empty">
           <Heart size={42} style={{ marginBottom: 12, opacity: 0.4 }} />
           <h3>Ingen venner ennå</h3>
@@ -73,55 +70,24 @@ export default function Matches() {
         </div>
       )}
 
-      {groups.length > 0 && (
-        <>
-          <div className="section-title" style={{ marginTop: 16 }}>Gruppesamtaler</div>
-          <div className="friend-list">
-            {groups.map(g => {
-              const photos = Object.values(g.memberProfiles || {}).slice(0, 3)
-              return (
-                <div key={g.id} className="friend-card" onClick={() => navigate(`/chat/gruppe/${g.id}`)} style={{ cursor: 'pointer' }}>
-                  <div className="group-avatar-stack small">
-                    {photos.map((m, i) => (
-                      <img key={i} src={m.photo} alt={m.name} className="group-avatar-img" style={{ zIndex: photos.length - i }} />
-                    ))}
-                    {photos.length === 0 && <div className="friend-photo" style={{ background: 'var(--cream)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Users size={20} /></div>}
-                  </div>
-                  <div className="friend-info">
-                    <strong>{g.name}</strong>
-                    <div className="hint" style={{ marginTop: 3, fontSize: '0.78rem' }}>
-                      {Object.keys(g.memberProfiles || {}).length} deltakere
-                    </div>
-                  </div>
-                  <button className="msg-icon-btn" aria-label="Åpne gruppe"><MessageCircle size={22} /></button>
-                </div>
-              )
-            })}
-          </div>
-        </>
-      )}
-
       {list && list.length > 0 && (
-        <>
-          <div className="section-title" style={{ marginTop: 16 }}>Venner</div>
-          <div className="friend-list">
-            {list.map((m) => (
-              <div key={m.id} className="friend-card">
-                <div className="friend-photo" style={{ backgroundImage: `url(${m.photo})` }} onClick={() => navigate(`/chat/${m.id}`)} />
-                <div className="friend-info" onClick={() => navigate(`/chat/${m.id}`)}>
-                  <strong>{m.name}, {m.age}</strong>
-                  <div className="hint" style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 3 }}>
-                    <MapPin size={12} /> {m.city}
-                  </div>
-                  {m.study && <div className="hint" style={{ marginTop: 2, fontSize: '0.78rem' }}>{m.study}</div>}
+        <div className="friend-list" style={{ marginTop: 8 }}>
+          {list.map((m) => (
+            <div key={m.id} className="friend-card">
+              <div className="friend-photo" style={{ backgroundImage: `url(${m.photo})` }} />
+              <div className="friend-info">
+                <strong>{m.name}, {m.age}</strong>
+                <div className="hint" style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 3 }}>
+                  <MapPin size={12} /> {m.city}
                 </div>
-                <button className="msg-icon-btn" onClick={() => navigate(`/chat/${m.id}`)} aria-label={`Send melding til ${m.name}`}>
-                  <MessageCircle size={22} />
-                </button>
+                {m.study && <div className="hint" style={{ marginTop: 2, fontSize: '0.78rem' }}>{m.study}</div>}
               </div>
-            ))}
-          </div>
-        </>
+              <button className="msg-icon-btn" onClick={() => navigate(`/chat/${m.id}`)} aria-label={`Send melding til ${m.name}`}>
+                <MessageCircle size={22} />
+              </button>
+            </div>
+          ))}
+        </div>
       )}
 
       {showModal && (
