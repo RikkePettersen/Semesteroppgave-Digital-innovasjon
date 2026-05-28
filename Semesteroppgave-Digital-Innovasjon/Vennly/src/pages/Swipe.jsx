@@ -212,7 +212,7 @@ export default function Swipe() {
           me={profile}
           them={matched}
           onClose={() => setMatched(null)}
-          onMessage={() => navigate('/chat')}
+          onMessage={() => navigate(`/chat/${matched.id}`)}
         />
       )}
     </Layout>
