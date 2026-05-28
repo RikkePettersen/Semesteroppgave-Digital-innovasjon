@@ -1,61 +1,23 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Heart, MapPin, MessageCircle, Plus, X, Check } from 'lucide-react'
+import { Heart, MapPin, MessageCircle } from 'lucide-react'
 import Layout from '../components/Layout'
 import { useAuth } from '../context/AuthContext'
 import { getMatches } from '../lib/matches'
-import { createGroupChat } from '../lib/groupChats'
 
 export default function Matches() {
-  const { user, profile } = useAuth()
+  const { user } = useAuth()
   const navigate = useNavigate()
-  const [list,      setList]      = useState(null)
-  const [showModal, setShowModal] = useState(false)
-  const [groupName, setGroupName] = useState('')
-  const [selected,  setSelected]  = useState([])
-  const [creating,  setCreating]  = useState(false)
+  const [list, setList] = useState(null)
 
   useEffect(() => {
     if (!user) return
     getMatches(user.uid).then(setList)
   }, [user])
 
-  function toggleSelect(match) {
-    setSelected(prev =>
-      prev.find(m => m.id === match.id)
-        ? prev.filter(m => m.id !== match.id)
-        : [...prev, { id: match.id, name: match.name, photo: match.photo }]
-    )
-  }
-
-  async function handleCreateGroup(e) {
-    e.preventDefault()
-    if (!groupName.trim() || selected.length < 1) return
-    setCreating(true)
-    const allMembers = [
-      { id: user.uid, name: profile?.name || 'Deg', photo: profile?.photo || '' },
-      ...selected,
-    ]
-    const group = await createGroupChat(user.uid, groupName.trim(), allMembers)
-    setShowModal(false)
-    setGroupName('')
-    setSelected([])
-    setCreating(false)
-    navigate(`/chat/gruppe/${group.id}`)
-  }
-
   return (
     <Layout title="Venner">
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
-        <h1 className="screen-title" style={{ margin: 0 }}>Dine venner</h1>
-        <button
-          className="btn"
-          style={{ padding: '8px 14px', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: 6 }}
-          onClick={() => setShowModal(true)}
-        >
-          <Plus size={15} /> Ny gruppe
-        </button>
-      </div>
+      <h1 className="screen-title">Dine venner</h1>
 
       {list === null && <p className="hint" style={{ marginTop: 16 }}>Laster …</p>}
 
@@ -87,48 +49,6 @@ export default function Matches() {
               </button>
             </div>
           ))}
-        </div>
-      )}
-
-      {showModal && (
-        <div className="modal-backdrop" onClick={() => setShowModal(false)}>
-          <div className="modal-box" onClick={e => e.stopPropagation()}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-              <h3 style={{ margin: 0 }}>Ny gruppesamtale</h3>
-              <button className="navbtn" onClick={() => setShowModal(false)}><X size={20} /></button>
-            </div>
-            <form onSubmit={handleCreateGroup}>
-              <div className="field">
-                <label>Gruppenavn</label>
-                <input value={groupName} onChange={e => setGroupName(e.target.value)} placeholder="F.eks. Kollokviegruppe …" required />
-              </div>
-              <label style={{ fontWeight: 600, fontSize: '0.85rem', display: 'block', marginBottom: 8 }}>
-                Inviter venner ({selected.length} valgt)
-              </label>
-              {!list || list.length === 0 ? (
-                <p className="hint">Du har ingen venner å invitere ennå.</p>
-              ) : (
-                <div className="friend-list" style={{ maxHeight: 240, overflowY: 'auto', gap: 6 }}>
-                  {list.map(m => {
-                    const isSelected = !!selected.find(s => s.id === m.id)
-                    return (
-                      <div key={m.id} className={`friend-card${isSelected ? ' selected-member' : ''}`} onClick={() => toggleSelect(m)} style={{ cursor: 'pointer' }}>
-                        <div className="friend-photo" style={{ backgroundImage: `url(${m.photo})` }} />
-                        <div className="friend-info">
-                          <strong>{m.name}</strong>
-                          <div className="hint" style={{ fontSize: '0.78rem' }}>{m.city}</div>
-                        </div>
-                        {isSelected && <Check size={20} color="var(--like)" />}
-                      </div>
-                    )
-                  })}
-                </div>
-              )}
-              <button className="btn" style={{ marginTop: 16, width: '100%' }} disabled={creating || !groupName.trim() || selected.length < 1}>
-                {creating ? 'Oppretter …' : 'Opprett gruppe'}
-              </button>
-            </form>
-          </div>
         </div>
       )}
     </Layout>
