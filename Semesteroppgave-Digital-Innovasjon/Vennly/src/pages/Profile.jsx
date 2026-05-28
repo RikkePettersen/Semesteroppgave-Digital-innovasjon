@@ -4,9 +4,18 @@ import {
   Settings as SettingsIcon, ShieldCheck, GraduationCap, MapPin,
   Check, Pencil, Crown, Camera, Loader, X, Navigation,
 } from 'lucide-react'
+import { ref, uploadString, getDownloadURL } from 'firebase/storage'
 import Layout from '../components/Layout'
 import { useAuth } from '../context/AuthContext'
+import { storage, isFirebaseConfigured } from '../firebase'
 import { CITIES, STUDY_PROGRAMS, INTERESTS } from '../data/options'
+
+async function uploadPhoto(uid, dataUrl, index) {
+  if (!isFirebaseConfigured) return dataUrl
+  const photoRef = ref(storage, `users/${uid}/photo_${index}_${Date.now()}.jpg`)
+  await uploadString(photoRef, dataUrl, 'data_url')
+  return await getDownloadURL(photoRef)
+}
 
 function compressImage(file, maxSize = 900, quality = 0.82) {
   return new Promise((resolve) => {
@@ -93,17 +102,19 @@ export default function Profile() {
     setPhotoError(null)
     try {
       const compressed = await compressImage(file)
+      const slotIdx = photoSlotIndex !== null ? photoSlotIndex : editPhotos.length
+      const url = await uploadPhoto(user.uid, compressed, slotIdx)
       const current = [...editPhotos]
       if (photoSlotIndex !== null && photoSlotIndex < current.length) {
-        current[photoSlotIndex] = compressed
+        current[photoSlotIndex] = url
       } else if (current.length < 6) {
-        current.push(compressed)
+        current.push(url)
       }
       const newPhotos = current.slice(0, 6)
       setDraft(d => ({ ...d, photos: newPhotos, photo: newPhotos[0] }))
       await saveProfile({ photos: newPhotos, photo: newPhotos[0] })
     } catch {
-      setPhotoError('Bildet kunne ikke lagres. Prøv et mindre bilde.')
+      setPhotoError('Bildet kunne ikke lastes opp. Prøv igjen.')
     } finally {
       setUploadingPhoto(false)
       setPhotoSlotIndex(null)

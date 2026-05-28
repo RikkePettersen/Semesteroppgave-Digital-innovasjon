@@ -41,13 +41,9 @@ export function AuthProvider({ children }) {
       if (fbUser) {
         try {
           const snap = await getDoc(doc(db, 'users', fbUser.uid))
-          const base = snap.exists() ? snap.data() : null
-          // Bilder lagres kun lokalt (for store for Firestore) – merge inn
-          const cached = JSON.parse(localStorage.getItem(`vennly_photos_${fbUser.uid}`) || 'null')
-          setProfile(base ? { ...base, ...(cached || {}) } : cached)
+          setProfile(snap.exists() ? snap.data() : null)
         } catch {
-          const cached = JSON.parse(localStorage.getItem(`vennly_photos_${fbUser.uid}`) || 'null')
-          setProfile(cached)
+          setProfile(null)
         }
       } else {
         setProfile(null)
@@ -122,35 +118,20 @@ export function AuthProvider({ children }) {
     setProfile(merged)
 
     if (!isFirebaseConfigured) {
-      const { photos: _p, photo: _ph, ...demoWithoutPhotos } = merged
       try {
         localStorage.setItem(DEMO_KEY, JSON.stringify(merged))
       } catch {
-        // Bilder overstiger trolig localStorage-kvoten – lagre uten bilder
-        localStorage.setItem(DEMO_KEY, JSON.stringify(demoWithoutPhotos))
+        const { photos: _p, photo: _ph, ...rest } = merged
+        localStorage.setItem(DEMO_KEY, JSON.stringify(rest))
       }
       return
     }
 
-    // Bilder er base64-blobs – for store for Firestore (1 MB-grense).
-    // Lagre dem kun lokalt; send bare tekstfelt til databasen.
-    const { photos, photo, ...firestoreFields } = updates
-    if (photos !== undefined || photo !== undefined) {
-      const cachedPhotos = { photos: merged.photos, photo: merged.photo }
-      try {
-        localStorage.setItem(`vennly_photos_${user.uid}`, JSON.stringify(cachedPhotos))
-      } catch {
-        throw new Error('Bildene er for store for lokal lagring. Prøv færre eller mindre bilder.')
-      }
-    }
-
-    if (Object.keys(firestoreFields).length > 0) {
-      const { photos: _p, photo: _ph, ...mergedForFirestore } = merged
-      try {
-        await updateDoc(doc(db, 'users', user.uid), firestoreFields)
-      } catch {
-        await setDoc(doc(db, 'users', user.uid), mergedForFirestore)
-      }
+    // Bilder er nå Firebase Storage-URL-er (korte strenger) – trygt å lagre i Firestore
+    try {
+      await updateDoc(doc(db, 'users', user.uid), updates)
+    } catch {
+      await setDoc(doc(db, 'users', user.uid), merged)
     }
   }
 
