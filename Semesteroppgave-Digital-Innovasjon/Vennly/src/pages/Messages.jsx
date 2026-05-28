@@ -4,7 +4,7 @@ import { MessageCircle, Users, Plus, X, Check } from 'lucide-react'
 import Layout from '../components/Layout'
 import { useAuth } from '../context/AuthContext'
 import { getMatches } from '../lib/matches'
-import { getMessages } from '../lib/messages'
+import { getActiveConversations } from '../lib/messages'
 import { getGroupChats, createGroupChat } from '../lib/groupChats'
 
 export default function Messages() {
@@ -19,21 +19,28 @@ export default function Messages() {
 
   useEffect(() => {
     if (!user) return
-    Promise.all([getMatches(user.uid), getGroupChats(user.uid)]).then(([matchList, groups]) => {
+    Promise.all([
+      getMatches(user.uid),
+      getGroupChats(user.uid),
+      getActiveConversations(user.uid),
+    ]).then(([matchList, groups, activeConvos]) => {
       setMatches(matchList)
 
-      const matchConvos = matchList.map(m => {
-        const msgs = getMessages(user.uid, m.id)
-        const last = msgs[msgs.length - 1]
-        return {
-          type: 'match',
-          id: m.id,
-          name: m.name,
-          photo: m.photo,
-          lastText: last?.text || null,
-          lastAt: last?.at || null,
-        }
-      })
+      const activeIds = new Map(activeConvos.map(c => [c.matchId, c]))
+
+      const matchConvos = matchList
+        .filter(m => activeIds.has(m.id))
+        .map(m => {
+          const conv = activeIds.get(m.id)
+          return {
+            type: 'match',
+            id: m.id,
+            name: m.name,
+            photo: m.photo,
+            lastText: conv.lastMessage || null,
+            lastAt: conv.lastAt || null,
+          }
+        })
 
       const groupConvos = groups.map(g => ({
         type: 'group',

@@ -1,15 +1,33 @@
 import {
-  collection, addDoc, onSnapshot,
-  orderBy, query, serverTimestamp,
+  collection, addDoc, getDocs, doc, setDoc,
+  onSnapshot, orderBy, query, serverTimestamp,
 } from 'firebase/firestore'
 import { db, isFirebaseConfigured } from '../firebase'
 
-// Stable conversation ID regardless of who initiates
 const convId = (a, b) => [a, b].sort().join('_')
 const localKey = (uid, matchId) => `vennly_msgs_${uid}_${matchId}`
 
 export function getMessages(uid, matchId) {
   return JSON.parse(localStorage.getItem(localKey(uid, matchId)) || '[]')
+}
+
+// Returns list of { matchId, lastMessage, lastAt } for conversations with messages
+export async function getActiveConversations(uid) {
+  if (!isFirebaseConfigured) {
+    // Scan localStorage for any conversation keys belonging to this user
+    const prefix = `vennly_msgs_${uid}_`
+    return Object.keys(localStorage)
+      .filter(k => k.startsWith(prefix))
+      .map(k => {
+        const msgs = JSON.parse(localStorage.getItem(k) || '[]')
+        if (msgs.length === 0) return null
+        const last = msgs[msgs.length - 1]
+        return { matchId: k.slice(prefix.length), lastMessage: last.text, lastAt: last.at }
+      })
+      .filter(Boolean)
+  }
+  const snap = await getDocs(collection(db, 'users', uid, 'conversations'))
+  return snap.docs.map(d => ({ matchId: d.id, ...d.data() }))
 }
 
 export function listenMessages(uid, matchId, callback) {
@@ -44,4 +62,8 @@ export async function saveMessage(uid, matchId, text, fromId) {
     from: fromId,
     createdAt: serverTimestamp(),
   })
+  // Track conversation for both participants so inbox can filter
+  const now = serverTimestamp()
+  await setDoc(doc(db, 'users', uid, 'conversations', matchId), { lastMessage: text, lastAt: now })
+  await setDoc(doc(db, 'users', matchId, 'conversations', uid), { lastMessage: text, lastAt: now })
 }
