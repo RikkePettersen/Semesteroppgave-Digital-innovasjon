@@ -17,22 +17,24 @@ async function fetchRealUsers(currentUid) {
   try {
     const snap = await getDocs(collection(db, 'users'))
     return snap.docs
-      .map(d => d.data())
-      .filter(u => u.uid !== currentUid && u.name && u.age)
-      .map(u => ({
-        id:        u.uid,
-        name:      u.name,
-        age:       u.age,
-        city:      u.city       || '',
-        study:     u.study      || '',
-        bio:       u.bio        || '',
-        interests: u.interests  || [],
-        photo:     u.photo      || '',
-        photos:    u.photos     || (u.photo ? [u.photo] : []),
-        coords:    u.coords     || null,
-        verified:  u.verifiedStudent || false,
-        isRealUser: true,
-      }))
+      .filter(d => d.id !== currentUid && d.data().name && d.data().age)
+      .map(d => {
+        const u = d.data()
+        return {
+          id:        d.id,
+          name:      u.name,
+          age:       u.age,
+          city:      u.city       || '',
+          study:     u.study      || '',
+          bio:       u.bio        || '',
+          interests: u.interests  || [],
+          photo:     u.photo      || '',
+          photos:    u.photos     || (u.photo ? [u.photo] : []),
+          coords:    u.coords     || null,
+          verified:  u.verifiedStudent || false,
+          isRealUser: true,
+        }
+      })
   } catch {
     return []
   }

@@ -5,8 +5,7 @@ import BottomNav from '../components/BottomNav'
 import Layout from '../components/Layout'
 import { useAuth } from '../context/AuthContext'
 import { getMatches } from '../lib/matches'
-import { getMessages, saveMessage } from '../lib/messages'
-
+import { listenMessages, saveMessage } from '../lib/messages'
 
 export default function Chat() {
   const { matchId } = useParams()
@@ -23,24 +22,28 @@ export default function Chat() {
     getMatches(user.uid).then(list => {
       const m = list.find(x => x.id === matchId)
       setMatch(m || null)
-      if (m) setMessages(getMessages(user.uid, matchId))
       setLoading(false)
     })
+  }, [user, matchId])
+
+  useEffect(() => {
+    if (!user || !matchId) return
+    const unsub = listenMessages(user.uid, matchId, setMessages)
+    return unsub
   }, [user, matchId])
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
 
-  function handleSend(e) {
+  async function handleSend(e) {
     e.preventDefault()
     if (!text.trim() || !match) return
-    const msg = saveMessage(user.uid, matchId, text.trim(), user.uid)
-    setMessages(prev => [...prev, msg])
+    const t = text.trim()
     setText('')
+    await saveMessage(user.uid, matchId, t, user.uid)
   }
 
-  // Ingen valgt samtale
   if (!matchId) {
     return (
       <Layout title="Meldinger">
@@ -82,11 +85,6 @@ export default function Chat() {
               {msg.text}
             </div>
           ))}
-          {typing && (
-            <div className="bubble theirs typing">
-              <span /><span /><span />
-            </div>
-          )}
           <div ref={bottomRef} />
         </div>
 
