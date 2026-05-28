@@ -90,7 +90,7 @@ export default function Messages() {
         <h1 className="screen-title" style={{ margin: 0 }}>Meldinger</h1>
         <button
           className="btn"
-          style={{ padding: '8px 14px', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: 6 }}
+          style={{ padding: '8px 14px', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: 6, width: 'auto' }}
           onClick={() => setShowModal(true)}
         >
           <Plus size={15} /> Ny gruppe
