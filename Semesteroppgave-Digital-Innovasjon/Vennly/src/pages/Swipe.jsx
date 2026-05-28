@@ -154,16 +154,6 @@ export default function Swipe() {
         </div>
       )}
 
-      {/* Posisjon ikke aktivert */}
-      {!userCoords && (
-        <button
-          className="loc-prompt"
-          onClick={() => navigate('/innstillinger')}
-        >
-          <Navigation size={14} />
-          Aktiver posisjon for å se avstand og folk i nærheten
-        </button>
-      )}
 
       {top ? (
         <>

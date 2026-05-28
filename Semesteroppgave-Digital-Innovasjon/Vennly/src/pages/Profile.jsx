@@ -2,7 +2,7 @@ import { useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   Settings as SettingsIcon, ShieldCheck, GraduationCap, MapPin,
-  Check, Pencil, Crown, Camera, Loader, X,
+  Check, Pencil, Crown, Camera, Loader, X, Navigation,
 } from 'lucide-react'
 import Layout from '../components/Layout'
 import { useAuth } from '../context/AuthContext'
@@ -196,6 +196,13 @@ export default function Profile() {
               <Crown size={28} color="#FD267A" />
               <p style={{ fontWeight: 700, marginTop: 6 }}>Du har Vennly Plus 👑</p>
             </div>
+          )}
+
+          {!profile.coords && (
+            <button className="loc-prompt" style={{ marginTop: 16 }} onClick={() => navigate('/innstillinger')}>
+              <Navigation size={14} />
+              Aktiver posisjon for å se avstand og folk i nærheten
+            </button>
           )}
 
           <div className="section-title">Studie</div>
