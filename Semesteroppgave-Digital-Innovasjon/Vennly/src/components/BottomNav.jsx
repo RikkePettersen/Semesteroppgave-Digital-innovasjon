@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
 import { Handshake, Heart, MessageCircle, CalendarDays, User } from 'lucide-react'
 
 const items = [
@@ -10,9 +10,10 @@ const items = [
 ]
 
 export default function BottomNav() {
+  const navigate = useNavigate()
   return (
     <nav className="bottomnav">
-      <div className="sidenav-brand">
+      <div className="sidenav-brand" onClick={() => navigate('/swipe')} style={{ cursor: 'pointer' }}>
         <img src="/vennly-mark.svg" alt="Vennly" />
         <span>vennly</span>
       </div>
