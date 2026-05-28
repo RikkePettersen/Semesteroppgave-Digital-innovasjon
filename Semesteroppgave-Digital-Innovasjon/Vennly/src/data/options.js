@@ -2,7 +2,7 @@
 
 export const CITIES = [
   'Oslo', 'Bergen', 'Trondheim', 'Tromsø', 'Stavanger',
-  'Kristiansand', 'Bodø', 'Ålesund', 'Drammen', 'Lillehammer',
+  'Kristiansand', 'Bodø', 'Ålesund', 'Drammen', 'Lillehammer','Vadsø',
 ]
 
 export const STUDY_PROGRAMS = [
